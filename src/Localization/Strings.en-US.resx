@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" msdata:Ordinal="0" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+
+  <!-- Main Window -->
+  <data name="AppTitle" xml:space="preserve">
+    <value>Translate Tool</value>
+  </data>
+  <data name="CopyAutoTranslate" xml:space="preserve">
+    <value>Copy text to auto-translate</value>
+  </data>
+  <data name="HotkeyHint" xml:space="preserve">
+    <value>Ctrl+Shift+T to show</value>
+  </data>
+  <data name="CopyTranslated" xml:space="preserve">
+    <value>Copy Translation</value>
+  </data>
+  <data name="SpeakSource" xml:space="preserve">
+    <value>Source</value>
+  </data>
+  <data name="SpeakTranslated" xml:space="preserve">
+    <value>Translation</value>
+  </data>
+  <data name="SourceText" xml:space="preserve">
+    <value>Source</value>
+  </data>
+  <data name="TranslatedText" xml:space="preserve">
+    <value>Translation</value>
+  </data>
+
+  <!-- Language Selection -->
+  <data name="Auto" xml:space="preserve">
+    <value>Auto</value>
+  </data>
+  <data name="Chinese" xml:space="preserve">
+    <value>Chinese</value>
+  </data>
+  <data name="English" xml:space="preserve">
+    <value>English</value>
+  </data>
+  <data name="Japanese" xml:space="preserve">
+    <value>Japanese</value>
+  </data>
+  <data name="Korean" xml:space="preserve">
+    <value>Korean</value>
+  </data>
+  <data name="French" xml:space="preserve">
+    <value>French</value>
+  </data>
+  <data name="German" xml:space="preserve">
+    <value>German</value>
+  </data>
+  <data name="Spanish" xml:space="preserve">
+    <value>Spanish</value>
+  </data>
+  <data name="Russian" xml:space="preserve">
+    <value>Russian</value>
+  </data>
+
+  <!-- Context Menu -->
+  <data name="MenuPasteTranslate" xml:space="preserve">
+    <value>Paste &amp; Translate</value>
+  </data>
+  <data name="MenuFileTranslate" xml:space="preserve">
+    <value>File Translate</value>
+  </data>
+  <data name="MenuFullScreenTranslate" xml:space="preserve">
+    <value>Full Screen Translate</value>
+  </data>
+  <data name="MenuRegionTranslate" xml:space="preserve">
+    <value>Region Translate</value>
+  </data>
+  <data name="MenuHistory" xml:space="preserve">
+    <value>History</value>
+  </data>
+  <data name="MenuEngine" xml:space="preserve">
+    <value>Translation Engine</value>
+  </data>
+  <data name="MenuApiSettings" xml:space="preserve">
+    <value>API Settings</value>
+  </data>
+  <data name="MenuAutoCopy" xml:space="preserve">
+    <value>Auto Copy Translation</value>
+  </data>
+  <data name="MenuShowWindow" xml:space="preserve">
+    <value>Show Window</value>
+  </data>
+  <data name="MenuExit" xml:space="preserve">
+    <value>Exit</value>
+  </data>
+
+  <!-- Settings Window -->
+  <data name="SettingsTitle" xml:space="preserve">
+    <value>API Configuration</value>
+  </data>
+  <data name="SettingsDesc" xml:space="preserve">
+    <value>Configure API keys for more stable translation service</value>
+  </data>
+  <data name="BaiduTranslate" xml:space="preserve">
+    <value>Baidu Translate</value>
+  </data>
+  <data name="BaiduDesc" xml:space="preserve">
+    <value>Free 2M characters/month</value>
+  </data>
+  <data name="AppId" xml:space="preserve">
+    <value>App ID</value>
+  </data>
+  <data name="SecretKey" xml:space="preserve">
+    <value>Secret Key</value>
+  </data>
+  <data name="ClearBaiduKey" xml:space="preserve">
+    <value>Clear Baidu Key</value>
+  </data>
+  <data name="DeepLTranslate" xml:space="preserve">
+    <value>DeepL Translate</value>
+  </data>
+  <data name="DeepLDesc" xml:space="preserve">
+    <value>Best quality · Free 500K characters/month</value>
+  </data>
+  <data name="ApiKey" xml:space="preserve">
+    <value>API Key</value>
+  </data>
+  <data name="ClearDeepLKey" xml:space="preserve">
+    <value>Clear DeepL Key</value>
+  </data>
+  <data name="SettingsNote" xml:space="preserve">
+    <value>After configuring API keys, translation engines will use official API for faster and more stable service.</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="SaveSettings" xml:space="preserve">
+    <value>Save Settings</value>
+  </data>
+  <data name="SettingsSaved" xml:space="preserve">
+    <value>✅ Settings saved</value>
+  </data>
+
+  <!-- History Window -->
+  <data name="HistoryTitle" xml:space="preserve">
+    <value>Translation History</value>
+  </data>
+  <data name="ClearHistory" xml:space="preserve">
+    <value>Clear History</value>
+  </data>
+  <data name="CopySource" xml:space="preserve">
+    <value>Copy Source</value>
+  </data>
+
+  <!-- Error Messages -->
+  <data name="ErrorClipboardEmpty" xml:space="preserve">
+    <value>Clipboard is empty</value>
+  </data>
+  <data name="ErrorFileNotFound" xml:space="preserve">
+    <value>File not found or invalid path</value>
+  </data>
+  <data name="ErrorFileEmpty" xml:space="preserve">
+    <value>File content is empty or cannot extract text</value>
+  </data>
+  <data name="TranslatingFile" xml:space="preserve">
+    <value>Translating file: {0}...</value>
+  </data>
+  <data name="ErrorFileTranslate" xml:space="preserve">
+    <value>File translation error: {0}</value>
+  </data>
+  <data name="ErrorFullScreen" xml:space="preserve">
+    <value>Full screen translation error: {0}</value>
+  </data>
+  <data name="ErrorRegion" xml:space="preserve">
+    <value>Region translation error: {0}</value>
+  </data>
+  <data name="ErrorEngine" xml:space="preserve">
+    <value>Engine error: {0}</value>
+  </data>
+  <data name="ErrorUnknown" xml:space="preserve">
+    <value>Translation failed: Unknown error</value>
+  </data>
+  <data name="ErrorRateLimit" xml:space="preserve">
+    <value>⚠️ {0} rate limit exceeded, please try later or switch engine</value>
+  </data>
+  <data name="ErrorForbidden" xml:space="preserve">
+    <value>⚠️ {0} access denied, try Baidu Translate</value>
+  </data>
+  <data name="ErrorTimeout" xml:space="preserve">
+    <value>⚠️ Network timeout, please check connection</value>
+  </data>
+  <data name="ErrorSSL" xml:space="preserve">
+    <value>⚠️ SSL connection error, try other engine</value>
+  </data>
+  <data name="ErrorFormat" xml:space="preserve">
+    <value>⚠️ {0} response error, try Baidu Translate</value>
+  </data>
+  <data name="TranslationFailed" xml:space="preserve">
+    <value>Translation failed: {0}</value>
+  </data>
+</root>

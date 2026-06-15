@@ -1,0 +1,109 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- 
+        深色主题 - 参考 Windows 11 Mica / macOS Sonoma 设计语言
+        设计原则：
+        - 低饱和度背景，减少视觉疲劳
+        - 柔和对比度，护眼舒适
+        - 保持品牌色一致性
+        - 符合 WCAG 无障碍标准
+    -->
+    
+    <!-- ============================================ -->
+    <!-- 主色调：琥珀色系（保持品牌一致性） -->
+    <!-- ============================================ -->
+    <SolidColorBrush x:Key="ClaudePrimary" Color="#F59E0B"/>
+    <SolidColorBrush x:Key="ClaudePrimaryLight" Color="#FBBF24"/>
+    <SolidColorBrush x:Key="ClaudePrimaryDark" Color="#D97706"/>
+    <SolidColorBrush x:Key="ClaudePrimaryMuted" Color="#451A03"/>
+    
+    <!-- ============================================ -->
+    <!-- 背景色：Windows 11 Mica 风格 -->
+    <!-- ============================================ -->
+    <!-- 主背景：深灰而非纯黑，减少OLED烧屏风险 -->
+    <SolidColorBrush x:Key="ClaudeBg" Color="#1E1E1E"/>
+    <!-- 卡片/表面：略浅于背景，创造层级感 -->
+    <SolidColorBrush x:Key="ClaudeSurface" Color="#2D2D2D"/>
+    <!-- 悬停状态：微妙提亮 -->
+    <SolidColorBrush x:Key="ClaudeSurfaceHover" Color="#383838"/>
+    <!-- 按下状态：进一步提亮 -->
+    <SolidColorBrush x:Key="ClaudeSurfaceActive" Color="#404040"/>
+    <!-- 输入框背景：比表面略深 -->
+    <SolidColorBrush x:Key="ClaudeInputBg" Color="#252525"/>
+    
+    <!-- ============================================ -->
+    <!-- 文字色：macOS 风格层级 -->
+    <!-- ============================================ -->
+    <!-- 主文字：使用 #E0E0E0 而非纯白，减少刺眼 -->
+    <SolidColorBrush x:Key="ClaudeText" Color="#E0E0E0"/>
+    <!-- 次要文字：中等灰度 -->
+    <SolidColorBrush x:Key="ClaudeTextSecondary" Color="#A0A0A0"/>
+    <!-- 占位符/禁用文字：低对比度 -->
+    <SolidColorBrush x:Key="ClaudeTextMuted" Color="#6B6B6B"/>
+    <!-- 反色文字（用于深色背景上的浅色按钮） -->
+    <SolidColorBrush x:Key="ClaudeTextInverse" Color="#1E1E1E"/>
+    
+    <!-- ============================================ -->
+    <!-- 边框 & 分隔线 -->
+    <!-- ============================================ -->
+    <!-- 主边框：微妙可见 -->
+    <SolidColorBrush x:Key="ClaudeBorder" Color="#404040"/>
+    <!-- 轻边框：更微妙 -->
+    <SolidColorBrush x:Key="ClaudeBorderLight" Color="#333333"/>
+    <!-- 焦点边框：使用品牌色 -->
+    <SolidColorBrush x:Key="ClaudeBorderFocus" Color="#F59E0B"/>
+    
+    <!-- ============================================ -->
+    <!-- 语义色：深色模式专用 -->
+    <!-- ============================================ -->
+    <!-- 成功：柔和绿色 -->
+    <SolidColorBrush x:Key="ClaudeSuccess" Color="#4ADE80"/>
+    <SolidColorBrush x:Key="ClaudeSuccessBg" Color="#052E16"/>
+    <SolidColorBrush x:Key="ClaudeSuccessBorder" Color="#166534"/>
+    
+    <!-- 错误：柔和红色 -->
+    <SolidColorBrush x:Key="ClaudeError" Color="#F87171"/>
+    <SolidColorBrush x:Key="ClaudeErrorBg" Color="#450A0A"/>
+    <SolidColorBrush x:Key="ClaudeErrorBorder" Color="#991B1B"/>
+    
+    <!-- 警告：柔和黄色 -->
+    <SolidColorBrush x:Key="ClaudeWarning" Color="#FBBF24"/>
+    <SolidColorBrush x:Key="ClaudeWarningBg" Color="#451A03"/>
+    <SolidColorBrush x:Key="ClaudeWarningBorder" Color="#92400E"/>
+    
+    <!-- 信息：柔和蓝色 -->
+    <SolidColorBrush x:Key="ClaudeInfo" Color="#60A5FA"/>
+    <SolidColorBrush x:Key="ClaudeInfoBg" Color="#1E3A5F"/>
+    <SolidColorBrush x:Key="ClaudeInfoBorder" Color="#1E40AF"/>
+    
+    <!-- ============================================ -->
+    <!-- 阴影：深色模式需要更强的阴影 -->
+    <!-- ============================================ -->
+    <DropShadowEffect x:Key="ShadowSm" BlurRadius="8" ShadowDepth="1" Color="#000000" Opacity="0.3"/>
+    <DropShadowEffect x:Key="ShadowMd" BlurRadius="16" ShadowDepth="2" Color="#000000" Opacity="0.4"/>
+    <DropShadowEffect x:Key="ShadowLg" BlurRadius="32" ShadowDepth="4" Color="#000000" Opacity="0.5"/>
+    
+    <!-- ============================================ -->
+    <!-- 交互状态 -->
+    <!-- ============================================ -->
+    <!-- 按钮悬停 -->
+    <SolidColorBrush x:Key="ClaudeButtonHover" Color="#404040"/>
+    <!-- 按钮按下 -->
+    <SolidColorBrush x:Key="ClaudeButtonPressed" Color="#4A4A4A"/>
+    <!-- 禁用状态 -->
+    <SolidColorBrush x:Key="ClaudeDisabled" Color="#4A4A4A"/>
+    <SolidColorBrush x:Key="ClaudeDisabledText" Color="#5A5A5A"/>
+    
+    <!-- ============================================ -->
+    <!-- 滚动条 -->
+    <!-- ============================================ -->
+    <SolidColorBrush x:Key="ClaudeScrollThumb" Color="#555555"/>
+    <SolidColorBrush x:Key="ClaudeScrollThumbHover" Color="#666666"/>
+    <SolidColorBrush x:Key="ClaudeScrollTrack" Color="#2D2D2D"/>
+    
+    <!-- ============================================ -->
+    <!-- 工具提示 -->
+    <!-- ============================================ -->
+    <SolidColorBrush x:Key="ClaudeTooltipBg" Color="#3D3D3D"/>
+    <SolidColorBrush x:Key="ClaudeTooltipText" Color="#E0E0E0"/>
+</ResourceDictionary>

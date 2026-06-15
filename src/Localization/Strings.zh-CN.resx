@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" msdata:Ordinal="0" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+
+  <!-- 主窗口 -->
+  <data name="AppTitle" xml:space="preserve">
+    <value>翻译工具</value>
+  </data>
+  <data name="CopyAutoTranslate" xml:space="preserve">
+    <value>复制文本自动翻译</value>
+  </data>
+  <data name="HotkeyHint" xml:space="preserve">
+    <value>Ctrl+Shift+T 唤出</value>
+  </data>
+  <data name="CopyTranslated" xml:space="preserve">
+    <value>复制译文</value>
+  </data>
+  <data name="SpeakSource" xml:space="preserve">
+    <value>原文</value>
+  </data>
+  <data name="SpeakTranslated" xml:space="preserve">
+    <value>译文</value>
+  </data>
+  <data name="SourceText" xml:space="preserve">
+    <value>原文</value>
+  </data>
+  <data name="TranslatedText" xml:space="preserve">
+    <value>译文</value>
+  </data>
+
+  <!-- 语言选择 -->
+  <data name="Auto" xml:space="preserve">
+    <value>自动</value>
+  </data>
+  <data name="Chinese" xml:space="preserve">
+    <value>中文</value>
+  </data>
+  <data name="English" xml:space="preserve">
+    <value>英文</value>
+  </data>
+  <data name="Japanese" xml:space="preserve">
+    <value>日文</value>
+  </data>
+  <data name="Korean" xml:space="preserve">
+    <value>韩文</value>
+  </data>
+  <data name="French" xml:space="preserve">
+    <value>法文</value>
+  </data>
+  <data name="German" xml:space="preserve">
+    <value>德文</value>
+  </data>
+  <data name="Spanish" xml:space="preserve">
+    <value>西班牙文</value>
+  </data>
+  <data name="Russian" xml:space="preserve">
+    <value>俄文</value>
+  </data>
+
+  <!-- 右键菜单 -->
+  <data name="MenuPasteTranslate" xml:space="preserve">
+    <value>文本粘贴翻译</value>
+  </data>
+  <data name="MenuFileTranslate" xml:space="preserve">
+    <value>文件翻译</value>
+  </data>
+  <data name="MenuFullScreenTranslate" xml:space="preserve">
+    <value>全屏自动翻译</value>
+  </data>
+  <data name="MenuRegionTranslate" xml:space="preserve">
+    <value>截图框选翻译</value>
+  </data>
+  <data name="MenuHistory" xml:space="preserve">
+    <value>翻译历史</value>
+  </data>
+  <data name="MenuEngine" xml:space="preserve">
+    <value>翻译引擎</value>
+  </data>
+  <data name="MenuApiSettings" xml:space="preserve">
+    <value>API 设置</value>
+  </data>
+  <data name="MenuAutoCopy" xml:space="preserve">
+    <value>自动复制译文</value>
+  </data>
+  <data name="MenuShowWindow" xml:space="preserve">
+    <value>显示悬浮窗</value>
+  </data>
+  <data name="MenuExit" xml:space="preserve">
+    <value>退出</value>
+  </data>
+
+  <!-- 设置窗口 -->
+  <data name="SettingsTitle" xml:space="preserve">
+    <value>API 配置</value>
+  </data>
+  <data name="SettingsDesc" xml:space="preserve">
+    <value>配置翻译引擎的 API 密钥以获得更稳定的翻译服务</value>
+  </data>
+  <data name="BaiduTranslate" xml:space="preserve">
+    <value>百度翻译</value>
+  </data>
+  <data name="BaiduDesc" xml:space="preserve">
+    <value>免费 200 万字符/月</value>
+  </data>
+  <data name="AppId" xml:space="preserve">
+    <value>App ID</value>
+  </data>
+  <data name="SecretKey" xml:space="preserve">
+    <value>Secret Key</value>
+  </data>
+  <data name="ClearBaiduKey" xml:space="preserve">
+    <value>清除百度密钥</value>
+  </data>
+  <data name="DeepLTranslate" xml:space="preserve">
+    <value>DeepL 翻译</value>
+  </data>
+  <data name="DeepLDesc" xml:space="preserve">
+    <value>翻译质量最佳 · 免费版 50 万字符/月</value>
+  </data>
+  <data name="ApiKey" xml:space="preserve">
+    <value>API Key</value>
+  </data>
+  <data name="ClearDeepLKey" xml:space="preserve">
+    <value>清除 DeepL 密钥</value>
+  </data>
+  <data name="SettingsNote" xml:space="preserve">
+    <value>配置 API 密钥后，翻译引擎将使用官方 API 接口，速度更快、更稳定。</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>取消</value>
+  </data>
+  <data name="SaveSettings" xml:space="preserve">
+    <value>保存设置</value>
+  </data>
+  <data name="SettingsSaved" xml:space="preserve">
+    <value>✅ 设置已保存</value>
+  </data>
+
+  <!-- 历史窗口 -->
+  <data name="HistoryTitle" xml:space="preserve">
+    <value>翻译历史</value>
+  </data>
+  <data name="ClearHistory" xml:space="preserve">
+    <value>清空历史</value>
+  </data>
+  <data name="CopySource" xml:space="preserve">
+    <value>复制原文</value>
+  </data>
+
+  <!-- 错误信息 -->
+  <data name="ErrorClipboardEmpty" xml:space="preserve">
+    <value>剪贴板为空</value>
+  </data>
+  <data name="ErrorFileNotFound" xml:space="preserve">
+    <value>文件不存在或路径无效</value>
+  </data>
+  <data name="ErrorFileEmpty" xml:space="preserve">
+    <value>文件内容为空或无法提取文本</value>
+  </data>
+  <data name="TranslatingFile" xml:space="preserve">
+    <value>正在翻译文件: {0}...</value>
+  </data>
+  <data name="ErrorFileTranslate" xml:space="preserve">
+    <value>文件翻译出错: {0}</value>
+  </data>
+  <data name="ErrorFullScreen" xml:space="preserve">
+    <value>全屏翻译出错: {0}</value>
+  </data>
+  <data name="ErrorRegion" xml:space="preserve">
+    <value>框选翻译出错: {0}</value>
+  </data>
+  <data name="ErrorEngine" xml:space="preserve">
+    <value>引擎错误: {0}</value>
+  </data>
+  <data name="ErrorUnknown" xml:space="preserve">
+    <value>翻译失败: 未知错误</value>
+  </data>
+  <data name="ErrorRateLimit" xml:space="preserve">
+    <value>⚠️ {0} 请求过于频繁，请稍后再试或切换其他引擎</value>
+  </data>
+  <data name="ErrorForbidden" xml:space="preserve">
+    <value>⚠️ {0} 访问被拒绝，建议切换到百度翻译引擎</value>
+  </data>
+  <data name="ErrorTimeout" xml:space="preserve">
+    <value>⚠️ 网络超时，请检查网络连接后重试</value>
+  </data>
+  <data name="ErrorSSL" xml:space="preserve">
+    <value>⚠️ 网络连接安全错误，请尝试其他引擎</value>
+  </data>
+  <data name="ErrorFormat" xml:space="preserve">
+    <value>⚠️ {0} 接口返回异常，建议切换到百度翻译引擎</value>
+  </data>
+  <data name="TranslationFailed" xml:space="preserve">
+    <value>翻译失败: {0}</value>
+  </data>
+</root>

@@ -1,0 +1,51 @@
+## .NET
+bin/
+obj/
+*.user
+*.suo
+*.cache
+*.vs/
+*.DotSettings.user
+
+## NuGet
+**/[Pp]ackages/*
+!**/[Pp]ackages/build/
+*.nuget.props
+*.nuget.targets
+*.nupkg
+
+## MSI Installer
+installer/bin/
+installer/obj/
+installer-msi/bin/
+installer-msi/obj/
+*.msi
+*.wixpdb
+*.cab
+
+## Publish output
+src/bin/Publish/
+
+## IDE
+.vs/
+.vscode/
+*.swp
+
+## OS
+.DS_Store
+Thumbs.db
+
+## Internal tools
+.codegraph/
+.reasonix/
+.uploads/
+memory/
+MEMORY.md
+
+## Sensitive config (API keys)
+app_settings.json
+translation_cache.json
+translation_history.json
+
+## Deploy helper (not part of source)
+deploy-github.ps1

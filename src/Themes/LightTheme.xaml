@@ -1,0 +1,90 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- 
+        浅色主题 - Claude 温暖优雅风格
+        设计原则：
+        - 温暖的米白色调，舒适阅读
+        - 琥珀色品牌色，温暖亲切
+        - 清晰的层级结构
+        - 符合 WCAG 无障碍标准
+    -->
+    
+    <!-- ============================================ -->
+    <!-- 主色调：温暖琥珀色 -->
+    <!-- ============================================ -->
+    <SolidColorBrush x:Key="ClaudePrimary" Color="#D97706"/>
+    <SolidColorBrush x:Key="ClaudePrimaryLight" Color="#F59E0B"/>
+    <SolidColorBrush x:Key="ClaudePrimaryDark" Color="#B45309"/>
+    <SolidColorBrush x:Key="ClaudePrimaryMuted" Color="#FEF3C7"/>
+    
+    <!-- ============================================ -->
+    <!-- 背景色 -->
+    <!-- ============================================ -->
+    <SolidColorBrush x:Key="ClaudeBg" Color="#FAF9F7"/>
+    <SolidColorBrush x:Key="ClaudeSurface" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="ClaudeSurfaceHover" Color="#F5F0EB"/>
+    <SolidColorBrush x:Key="ClaudeSurfaceActive" Color="#EDE9E3"/>
+    <SolidColorBrush x:Key="ClaudeInputBg" Color="#FFFFFF"/>
+    
+    <!-- ============================================ -->
+    <!-- 文字色 -->
+    <!-- ============================================ -->
+    <SolidColorBrush x:Key="ClaudeText" Color="#1C1917"/>
+    <SolidColorBrush x:Key="ClaudeTextSecondary" Color="#78716C"/>
+    <SolidColorBrush x:Key="ClaudeTextMuted" Color="#A8A29E"/>
+    <SolidColorBrush x:Key="ClaudeTextInverse" Color="#FFFFFF"/>
+    
+    <!-- ============================================ -->
+    <!-- 边框 & 分隔线 -->
+    <!-- ============================================ -->
+    <SolidColorBrush x:Key="ClaudeBorder" Color="#E7E5E4"/>
+    <SolidColorBrush x:Key="ClaudeBorderLight" Color="#F5F5F4"/>
+    <SolidColorBrush x:Key="ClaudeBorderFocus" Color="#D97706"/>
+    
+    <!-- ============================================ -->
+    <!-- 语义色 -->
+    <!-- ============================================ -->
+    <SolidColorBrush x:Key="ClaudeSuccess" Color="#16A34A"/>
+    <SolidColorBrush x:Key="ClaudeSuccessBg" Color="#F0FDF4"/>
+    <SolidColorBrush x:Key="ClaudeSuccessBorder" Color="#BBF7D0"/>
+    
+    <SolidColorBrush x:Key="ClaudeError" Color="#DC2626"/>
+    <SolidColorBrush x:Key="ClaudeErrorBg" Color="#FEF2F2"/>
+    <SolidColorBrush x:Key="ClaudeErrorBorder" Color="#FECACA"/>
+    
+    <SolidColorBrush x:Key="ClaudeWarning" Color="#D97706"/>
+    <SolidColorBrush x:Key="ClaudeWarningBg" Color="#FFFBEB"/>
+    <SolidColorBrush x:Key="ClaudeWarningBorder" Color="#FDE68A"/>
+    
+    <SolidColorBrush x:Key="ClaudeInfo" Color="#2563EB"/>
+    <SolidColorBrush x:Key="ClaudeInfoBg" Color="#EFF6FF"/>
+    <SolidColorBrush x:Key="ClaudeInfoBorder" Color="#BFDBFE"/>
+    
+    <!-- ============================================ -->
+    <!-- 阴影 -->
+    <!-- ============================================ -->
+    <DropShadowEffect x:Key="ShadowSm" BlurRadius="8" ShadowDepth="1" Color="#000000" Opacity="0.04"/>
+    <DropShadowEffect x:Key="ShadowMd" BlurRadius="16" ShadowDepth="2" Color="#000000" Opacity="0.06"/>
+    <DropShadowEffect x:Key="ShadowLg" BlurRadius="32" ShadowDepth="4" Color="#000000" Opacity="0.08"/>
+    
+    <!-- ============================================ -->
+    <!-- 交互状态 -->
+    <!-- ============================================ -->
+    <SolidColorBrush x:Key="ClaudeButtonHover" Color="#F5F0EB"/>
+    <SolidColorBrush x:Key="ClaudeButtonPressed" Color="#EDE9E3"/>
+    <SolidColorBrush x:Key="ClaudeDisabled" Color="#E7E5E4"/>
+    <SolidColorBrush x:Key="ClaudeDisabledText" Color="#A8A29E"/>
+    
+    <!-- ============================================ -->
+    <!-- 滚动条 -->
+    <!-- ============================================ -->
+    <SolidColorBrush x:Key="ClaudeScrollThumb" Color="#D6D3D1"/>
+    <SolidColorBrush x:Key="ClaudeScrollThumbHover" Color="#A8A29E"/>
+    <SolidColorBrush x:Key="ClaudeScrollTrack" Color="#F5F5F4"/>
+    
+    <!-- ============================================ -->
+    <!-- 工具提示 -->
+    <!-- ============================================ -->
+    <SolidColorBrush x:Key="ClaudeTooltipBg" Color="#1C1917"/>
+    <SolidColorBrush x:Key="ClaudeTooltipText" Color="#FFFFFF"/>
+</ResourceDictionary>

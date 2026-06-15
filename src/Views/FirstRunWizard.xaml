@@ -1,0 +1,163 @@
+<Window x:Class="TranslateTool.Views.FirstRunWizard"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="欢迎使用翻译工具"
+        Height="520"
+        Width="500"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize"
+        Background="{StaticResource ClaudeBg}">
+
+    <Window.Resources>
+        <!-- Section 卡片样式 -->
+        <Style x:Key="SectionCard" TargetType="Border">
+            <Setter Property="Background" Value="{StaticResource ClaudeSurface}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource ClaudeBorder}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="{StaticResource RadiusMd}"/>
+            <Setter Property="Padding" Value="20,16"/>
+            <Setter Property="Margin" Value="0,0,0,14"/>
+            <Setter Property="Effect" Value="{StaticResource ShadowSm}"/>
+        </Style>
+
+        <!-- 输入框 -->
+        <Style x:Key="InputBox" TargetType="TextBox">
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Padding" Value="12,10"/>
+            <Setter Property="Background" Value="{StaticResource ClaudeSurface}"/>
+            <Setter Property="Foreground" Value="{StaticResource ClaudeText}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource ClaudeBorder}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Margin" Value="0,0,0,10"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="32">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- 标题 -->
+        <StackPanel Grid.Row="0" Margin="0,0,0,24">
+            <TextBlock Text="欢迎使用翻译工具"
+                       FontSize="24"
+                       FontWeight="Bold"
+                       Foreground="{StaticResource ClaudeText}"/>
+            <TextBlock Text="首次运行需要完成以下配置"
+                       FontSize="14"
+                       Foreground="{StaticResource ClaudeTextSecondary}"
+                       Margin="0,8,0,0"/>
+        </StackPanel>
+
+        <!-- 步骤内容 -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <StackPanel x:Name="StepPanel">
+                <!-- 步骤 1: OCR 语言包 -->
+                <Border Style="{StaticResource SectionCard}">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                            <Border Width="28" Height="28"
+                                    CornerRadius="14"
+                                    Background="{StaticResource ClaudePrimary}"
+                                    Margin="0,0,10,0">
+                                <TextBlock Text="1"
+                                           Foreground="White"
+                                           FontSize="14"
+                                           FontWeight="Bold"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"/>
+                            </Border>
+                            <TextBlock Text="OCR 语言包（可选）"
+                                       FontSize="16"
+                                       FontWeight="SemiBold"
+                                       Foreground="{StaticResource ClaudeText}"
+                                       VerticalAlignment="Center"/>
+                        </StackPanel>
+                        <TextBlock Text="如果需要使用框选翻译功能，需要下载 Tesseract OCR 语言包。"
+                                   TextWrapping="Wrap"
+                                   Foreground="{StaticResource ClaudeTextSecondary}"
+                                   Margin="38,0,0,12"/>
+                        <TextBlock x:Name="OcrStatusText"
+                                   Text="语言包状态：未检测"
+                                   FontSize="12"
+                                   Foreground="{StaticResource ClaudeTextMuted}"
+                                   Margin="38,0,0,8"/>
+                        <Button x:Name="DownloadOcrButton"
+                                Content="下载 OCR 语言包"
+                                Style="{StaticResource ClaudeButtonSecondary}"
+                                HorizontalAlignment="Left"
+                                Margin="38,0,0,0"
+                                Click="DownloadOcr_Click"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- 步骤 2: 百度翻译 API -->
+                <Border Style="{StaticResource SectionCard}">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                            <Border Width="28" Height="28"
+                                    CornerRadius="14"
+                                    Background="{StaticResource ClaudePrimary}"
+                                    Margin="0,0,10,0">
+                                <TextBlock Text="2"
+                                           Foreground="White"
+                                           FontSize="14"
+                                           FontWeight="Bold"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"/>
+                            </Border>
+                            <TextBlock Text="百度翻译 API（推荐）"
+                                       FontSize="16"
+                                       FontWeight="SemiBold"
+                                       Foreground="{StaticResource ClaudeText}"
+                                       VerticalAlignment="Center"/>
+                        </StackPanel>
+                        <TextBlock Text="免费 200 万字符/月，配置后翻译更稳定快速"
+                                   TextWrapping="Wrap"
+                                   Foreground="{StaticResource ClaudeTextSecondary}"
+                                   Margin="38,0,0,12"/>
+                        <TextBlock Text="申请地址：https://fanyi-api.baidu.com/product/11"
+                                   FontSize="12"
+                                   Foreground="{StaticResource ClaudePrimary}"
+                                   Margin="38,0,0,12"/>
+                        <StackPanel Margin="38,0,0,0">
+                            <TextBlock Text="App ID"
+                                       FontSize="12"
+                                       Foreground="{StaticResource ClaudeTextSecondary}"
+                                       Margin="0,0,0,4"/>
+                            <TextBox x:Name="BaiduAppIdBox"
+                                     Style="{StaticResource InputBox}"
+                                     Margin="0,0,0,10"/>
+                            <TextBlock Text="Secret Key"
+                                       FontSize="12"
+                                       Foreground="{StaticResource ClaudeTextSecondary}"
+                                       Margin="0,0,0,4"/>
+                            <TextBox x:Name="BaiduSecretKeyBox"
+                                     Style="{StaticResource InputBox}"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- 跳过提示 -->
+                <TextBlock Text="以上配置均可跳过，稍后在托盘菜单 → API 设置中配置"
+                           TextWrapping="Wrap"
+                           Foreground="{StaticResource ClaudeTextMuted}"
+                           FontSize="12"
+                           Margin="0,8,0,0"/>
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- 底部按钮 -->
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
+            <Button Content="跳过"
+                    Style="{StaticResource ClaudeButtonSecondary}"
+                    Click="Skip_Click"
+                    Margin="0,0,10,0"/>
+            <Button Content="完成配置"
+                    Style="{StaticResource ClaudeButtonPrimary}"
+                    Click="Finish_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>
