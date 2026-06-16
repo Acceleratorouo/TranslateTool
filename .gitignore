@@ -42,6 +42,15 @@ Thumbs.db
 memory/
 MEMORY.md
 
+## Docs (local only)
+CODE_WIKI.md
+trae-agent-code-wiki.md
+docs/superpowers/
+
+## Assets (local only)
+creative-brand-art.svg
+ig_*.png
+
 ## Sensitive config (API keys)
 app_settings.json
 translation_cache.json
