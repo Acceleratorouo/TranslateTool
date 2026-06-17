@@ -4,6 +4,7 @@ using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media.Animation;
 using TranslateTool.Models;
+using TranslateTool.Services;
 using TranslateTool.ViewModels;
 
 namespace TranslateTool.Views;
@@ -199,21 +200,21 @@ public partial class FloatingWindow : Window
         };
 
         var settingsItem = new MenuItem { Header = "翻译引擎" };
-        var engines = new[] { ("baidu", "百度翻译"), ("google", "Google 翻译"), ("microsoft", "微软翻译"), ("deepl", "DeepL 翻译") };
-        foreach (var (key, label) in engines)
+        var engines = EngineStatus.GetAll();
+        foreach (var status in engines)
         {
             var item = new MenuItem
             {
-                Header = label,
-                IsChecked = AppSettings.Current.TranslationEngine.Equals(key, StringComparison.OrdinalIgnoreCase),
-                Tag = key
+                Header = $"{status.GetStatusIcon()} {status.Label}",
+                IsChecked = AppSettings.Current.TranslationEngine.Equals(status.Name, StringComparison.OrdinalIgnoreCase),
+                Tag = status.Name
             };
             item.Click += (_, _) =>
             {
-                AppSettings.Current.TranslationEngine = key;
+                AppSettings.Current.TranslationEngine = status.Name;
                 foreach (MenuItem mi in settingsItem.Items)
                 {
-                    mi.IsChecked = mi.Tag?.ToString() == key;
+                    mi.IsChecked = mi.Tag?.ToString() == status.Name;
                 }
             };
             settingsItem.Items.Add(item);
