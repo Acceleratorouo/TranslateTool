@@ -59,7 +59,7 @@ public partial class LlmProviderEditViewModel : ObservableObject
         }
     }
 
-    [RelayCommand]
+    [RelayCommand(AllowConcurrentExecutions = false)]
     private async Task TestConnectionAsync()
     {
         var provider = BuildProvider();
@@ -86,6 +86,11 @@ public partial class LlmProviderEditViewModel : ObservableObject
             {
                 LlmProviderService.Providers[index] = provider;
             }
+            else
+            {
+                // EditingProvider was a template (not yet in Providers) — add as new
+                LlmProviderService.Providers.Add(provider);
+            }
         }
         else
         {
@@ -106,16 +111,22 @@ public partial class LlmProviderEditViewModel : ObservableObject
 
     private LlmProvider BuildProvider()
     {
-        var provider = EditingProvider is not null
-            ? new LlmProvider { Id = EditingProvider.Id }
-            : new LlmProvider();
+        // Determine if we're editing an existing provider (vs. pre-filling from a template)
+        bool isExistingEdit = EditingProvider is not null
+            && LlmProviderService.Providers.Any(p => p.Id == EditingProvider.Id);
+
+        var provider = isExistingEdit
+            ? new LlmProvider { Id = EditingProvider!.Id }
+            : new LlmProvider();  // new Guid generated for new/template-derived providers
 
         provider.DisplayName = string.IsNullOrWhiteSpace(DisplayName) ? "未命名供应商" : DisplayName.Trim();
         provider.Notes = string.IsNullOrWhiteSpace(Notes) ? null : Notes.Trim();
         provider.HomepageUrl = string.IsNullOrWhiteSpace(HomepageUrl) ? null : HomepageUrl.Trim();
         provider.BaseUrl = BaseUrl.Trim();
         provider.ApiKey = string.IsNullOrWhiteSpace(ApiKey) ? null : ApiKey.Trim();
-        provider.ApiFormat = Enum.Parse<LlmApiFormat>(ApiFormat, ignoreCase: true);
+        provider.ApiFormat = Enum.TryParse<LlmApiFormat>(ApiFormat, ignoreCase: true, out var fmt)
+            ? fmt
+            : LlmApiFormat.OpenAiCompatible;
         provider.AuthHeader = string.IsNullOrWhiteSpace(AuthHeader) ? "Authorization" : AuthHeader.Trim();
         provider.AuthPrefix = string.IsNullOrWhiteSpace(AuthPrefix) ? "Bearer" : AuthPrefix.Trim();
         provider.Models = ModelsText
