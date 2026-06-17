@@ -94,6 +94,12 @@
             <StackPanel>
                 <TextBlock Text="AI 翻译参数" FontSize="15" FontWeight="SemiBold" Foreground="{DynamicResource ClaudeText}" Margin="0,0,0,12"/>
 
+                <TextBlock Text="翻译模型（从默认供应商的模型列表中选择）" Foreground="{DynamicResource ClaudeTextSecondary}" Margin="0,0,0,6"/>
+                <ComboBox ItemsSource="{Binding AvailableModels}"
+                          SelectedItem="{Binding SelectedModel}"
+                          Background="{DynamicResource ClaudeInputBg}" Foreground="{DynamicResource ClaudeText}"
+                          Padding="10,8" Margin="0,0,0,12"/>
+
                 <TextBlock Text="系统提示词" Foreground="{DynamicResource ClaudeTextSecondary}" Margin="0,0,0,6"/>
                 <TextBox Text="{Binding SystemPrompt, UpdateSourceTrigger=PropertyChanged}"
                          Background="{DynamicResource ClaudeInputBg}" Foreground="{DynamicResource ClaudeText}"

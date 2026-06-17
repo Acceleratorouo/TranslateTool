@@ -32,6 +32,11 @@ public partial class LlmProviderSettingsViewModel : ObservableObject
     private int _timeoutSeconds;
 
     [ObservableProperty]
+    private string _selectedModel = "";
+
+    public ObservableCollection<string> AvailableModels { get; } = new();
+
+    [ObservableProperty]
     private bool _isDeploying;
 
     [ObservableProperty]
@@ -55,6 +60,48 @@ public partial class LlmProviderSettingsViewModel : ObservableObject
         Temperature = LlmProviderService.Settings.Temperature;
         MaxTokens = LlmProviderService.Settings.MaxTokens;
         TimeoutSeconds = LlmProviderService.Settings.TimeoutSeconds;
+        RefreshAvailableModels();
+    }
+
+    /// <summary>
+    /// 从默认供应商加载可用模型列表，并保持当前选中的模型（若仍存在）。
+    /// </summary>
+    private void RefreshAvailableModels()
+    {
+        var previousModel = LlmProviderService.Settings.DefaultModel ?? "";
+        AvailableModels.Clear();
+
+        var provider = LlmProviderService.GetDefaultProvider();
+        if (provider is not null)
+        {
+            foreach (var m in provider.Models)
+            {
+                AvailableModels.Add(m);
+            }
+        }
+
+        // 选中之前保存的模型；若不存在则选第一个（若有）
+        if (AvailableModels.Contains(previousModel))
+        {
+            SelectedModel = previousModel;
+        }
+        else if (AvailableModels.Count > 0)
+        {
+            SelectedModel = AvailableModels[0];
+        }
+        else
+        {
+            SelectedModel = "";
+        }
+    }
+
+    /// <summary>
+    /// 当供应商列表刷新后（增删改/设默认），同步刷新模型列表。
+    /// </summary>
+    partial void OnSelectedModelChanged(string value)
+    {
+        // 即时更新到 Settings，便于后续翻译直接使用
+        LlmProviderService.Settings.DefaultModel = string.IsNullOrWhiteSpace(value) ? null : value;
     }
 
     private void RefreshProviders()
@@ -64,6 +111,7 @@ public partial class LlmProviderSettingsViewModel : ObservableObject
         {
             Providers.Add(p);
         }
+        RefreshAvailableModels();
     }
 
     [RelayCommand]
@@ -275,6 +323,7 @@ public partial class LlmProviderSettingsViewModel : ObservableObject
         LlmProviderService.Settings.Temperature = Temperature;
         LlmProviderService.Settings.MaxTokens = MaxTokens;
         LlmProviderService.Settings.TimeoutSeconds = TimeoutSeconds;
+        LlmProviderService.Settings.DefaultModel = string.IsNullOrWhiteSpace(SelectedModel) ? null : SelectedModel;
         LlmProviderService.SaveProviders();
         StatusMessage = "✅ AI 翻译设置已保存";
     }
