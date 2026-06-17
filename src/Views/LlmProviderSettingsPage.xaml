@@ -2,22 +2,13 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              Background="{DynamicResource ClaudeBg}">
-    <Grid Margin="20">
+    <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <TextBlock Grid.Row="0" Text="AI 翻译设置"
-                   FontSize="20" FontWeight="Bold" Foreground="{DynamicResource ClaudeText}"
-                   Margin="0,0,0,8"/>
-        <TextBlock Grid.Row="1" Text="选择 AI 引擎时生效。默认使用本地 Gemma 4 E4B，也可添加其他在线或本地供应商。"
-                   FontSize="12" Foreground="{DynamicResource ClaudeTextMuted}" TextWrapping="Wrap"
-                   Margin="0,0,0,16"/>
-
-        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
+        <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto">
             <StackPanel>
                 <Border Background="{DynamicResource ClaudeSurface}" BorderBrush="{DynamicResource ClaudeBorder}"
                         BorderThickness="1" CornerRadius="10" Padding="16" Margin="0,0,0,14">
@@ -92,7 +83,7 @@
             </StackPanel>
         </ScrollViewer>
 
-        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
             <TextBlock Text="{Binding StatusMessage}" VerticalAlignment="Center" Margin="0,0,12,0"
                        Foreground="{DynamicResource ClaudeSuccess}"/>
             <Button Content="保存" Command="{Binding SaveSettingsCommand}"

@@ -1,6 +1,7 @@
 <Window x:Class="TranslateTool.Views.SettingsWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:TranslateTool.Views"
         Title="翻译工具设置"
         MinHeight="480"
         MinWidth="440"
@@ -145,6 +146,14 @@
                             <ComboBoxItem Content="E" AutomationProperties.Name="E"/>
                             <ComboBoxItem Content="R" AutomationProperties.Name="R"/>
                         </ComboBox>
+                    </StackPanel>
+                </Border>
+
+                <Border Style="{StaticResource SectionCard}">
+                    <StackPanel>
+                        <TextBlock Style="{StaticResource SectionHeader}" Text="AI 翻译"/>
+                        <TextBlock Style="{StaticResource SectionDesc}" Text="配置 LLM 供应商，本地 Gemma 4 E4B 为默认源"/>
+                        <local:LlmProviderSettingsPage/>
                     </StackPanel>
                 </Border>
 
