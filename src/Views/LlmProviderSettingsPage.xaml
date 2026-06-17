@@ -50,8 +50,49 @@
                             <Button Content="自定义添加" Command="{Binding AddCustomCommand}"
                                     Style="{DynamicResource ClaudeButtonSecondary}" Margin="0,0,8,0"/>
                             <Button Content="部署本地 Gemma 4 E4B" Command="{Binding DeployLocalGemmaCommand}"
-                                    Style="{DynamicResource ClaudeButtonPrimary}"/>
+                                    Style="{DynamicResource ClaudeButtonPrimary}" Margin="0,0,8,0"/>
                         </StackPanel>
+
+                        <!-- 部署进度条 -->
+                        <StackPanel Margin="0,12,0,0"
+                                    Visibility="{Binding HasDeployStatus, Converter={StaticResource BooleanToVisibilityConverter}}">
+                            <TextBlock Text="{Binding DeployStatusText}" Foreground="{DynamicResource ClaudeTextSecondary}"
+                                       Margin="0,0,0,6" TextWrapping="Wrap"/>
+                            <ProgressBar Value="{Binding DeployProgress}" Maximum="100" Height="6"
+                                         Visibility="{Binding IsDeploying, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                        </StackPanel>
+
+                        <!-- 本地部署操作文档 -->
+                        <Expander Header="📖 本地部署操作文档" Margin="0,12,0,0"
+                                  Foreground="{DynamicResource ClaudeText}"
+                                  Background="{DynamicResource ClaudeInputBg}" BorderBrush="{DynamicResource ClaudeBorder}">
+                            <StackPanel Margin="0,8,0,0">
+                                <TextBlock Text="本地部署 Gemma 4 E4B 完整流程：" FontWeight="Medium"
+                                           Foreground="{DynamicResource ClaudeText}" Margin="0,0,0,8"/>
+                                <TextBlock Foreground="{DynamicResource ClaudeTextSecondary}" TextWrapping="Wrap" Margin="0,0,0,4">
+                                    <Run Text="1. 安装 Ollama：前往"/>
+                                    <Hyperlink NavigateUri="https://ollama.com" RequestNavigate="Hyperlink_RequestNavigate"
+                                               Foreground="{DynamicResource ClaudePrimary}">ollama.com</Hyperlink>
+                                    <Run Text=" 下载并安装（Windows 版安装包，约 300MB）。"/>
+                                </TextBlock>
+                                <TextBlock Text="2. 安装完成后，确认 Ollama 服务已启动（系统托盘会出现 Ollama 图标，或终端运行 ollama --version 验证）。"
+                                           Foreground="{DynamicResource ClaudeTextSecondary}" TextWrapping="Wrap" Margin="0,0,0,4"/>
+                                <TextBlock Text="3. 点击上方「部署本地 Gemma 4 E4B」按钮，等待下载完成（进度条显示实时进度，模型约 5GB，请保持网络畅通）。"
+                                           Foreground="{DynamicResource ClaudeTextSecondary}" TextWrapping="Wrap" Margin="0,0,0,4"/>
+                                <TextBlock Text="4. 部署完成后，在上方供应商列表中确认 Ollama 供应商已存在。"
+                                           Foreground="{DynamicResource ClaudeTextSecondary}" TextWrapping="Wrap" Margin="0,0,0,4"/>
+                                <TextBlock Text="5. 点击 Ollama 供应商的「编辑」按钮，确认 BaseUrl 为 http://localhost:11434/v1，模型列表填入 gemma4:e4b。"
+                                           Foreground="{DynamicResource ClaudeTextSecondary}" TextWrapping="Wrap" Margin="0,0,0,4"/>
+                                <TextBlock Text="6. 点击 Ollama 供应商的「默认」按钮，将其设为 AI 翻译默认源。"
+                                           Foreground="{DynamicResource ClaudeTextSecondary}" TextWrapping="Wrap" Margin="0,0,0,4"/>
+                                <TextBlock Text="7. 在主界面右键菜单 → 翻译引擎 → 选择「AI 翻译」。"
+                                           Foreground="{DynamicResource ClaudeTextSecondary}" TextWrapping="Wrap" Margin="0,0,0,4"/>
+                                <TextBlock Text="8. 开始翻译！选中文本即可自动使用本地 Gemma 4 E4B 进行 AI 翻译，无需联网，隐私安全。"
+                                           Foreground="{DynamicResource ClaudeTextSecondary}" TextWrapping="Wrap" Margin="0,0,0,8"/>
+                                <TextBlock Text="提示：如果 Ollama 服务未自动启动，可在终端运行 ollama serve 手动启动。首次翻译可能稍慢（模型加载到内存），后续翻译会更快。"
+                                           Foreground="{DynamicResource ClaudeTextMuted}" TextWrapping="Wrap"/>
+                            </StackPanel>
+                        </Expander>
                     </StackPanel>
                 </Border>
 
