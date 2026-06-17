@@ -1,0 +1,76 @@
+<Window x:Class="TranslateTool.Views.LlmProviderEditWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="编辑 AI 供应商"
+        Height="580" Width="480"
+        WindowStartupLocation="CenterScreen"
+        Background="{DynamicResource ClaudeBg}">
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Margin="0,0,0,8">
+            <StackPanel>
+                <TextBlock Text="配置名称" Foreground="{DynamicResource ClaudeTextSecondary}" Margin="0,0,0,6"/>
+                <TextBox Text="{Binding DisplayName, UpdateSourceTrigger=PropertyChanged}"
+                         Background="{DynamicResource ClaudeInputBg}" Foreground="{DynamicResource ClaudeText}"
+                         Padding="10,8" Margin="0,0,0,12"/>
+
+                <TextBlock Text="备注" Foreground="{DynamicResource ClaudeTextSecondary}" Margin="0,0,0,6"/>
+                <TextBox Text="{Binding Notes, UpdateSourceTrigger=PropertyChanged}"
+                         Background="{DynamicResource ClaudeInputBg}" Foreground="{DynamicResource ClaudeText}"
+                         Padding="10,8" Margin="0,0,0,12"/>
+
+                <TextBlock Text="官网链接" Foreground="{DynamicResource ClaudeTextSecondary}" Margin="0,0,0,6"/>
+                <TextBox Text="{Binding HomepageUrl, UpdateSourceTrigger=PropertyChanged}"
+                         Background="{DynamicResource ClaudeInputBg}" Foreground="{DynamicResource ClaudeText}"
+                         Padding="10,8" Margin="0,0,0,12"/>
+
+                <TextBlock Text="API 地址" Foreground="{DynamicResource ClaudeTextSecondary}" Margin="0,0,0,6"/>
+                <TextBox Text="{Binding BaseUrl, UpdateSourceTrigger=PropertyChanged}"
+                         Background="{DynamicResource ClaudeInputBg}" Foreground="{DynamicResource ClaudeText}"
+                         Padding="10,8" Margin="0,0,0,12"/>
+
+                <TextBlock Text="API Key" Foreground="{DynamicResource ClaudeTextSecondary}" Margin="0,0,0,6"/>
+                <TextBox Text="{Binding ApiKey, UpdateSourceTrigger=PropertyChanged}"
+                         Background="{DynamicResource ClaudeInputBg}" Foreground="{DynamicResource ClaudeText}"
+                         Padding="10,8" Margin="0,0,0,12"/>
+
+                <TextBlock Text="API 格式" Foreground="{DynamicResource ClaudeTextSecondary}" Margin="0,0,0,6"/>
+                <ComboBox ItemsSource="{Binding ApiFormatOptions}"
+                          SelectedItem="{Binding ApiFormat}"
+                          Margin="0,0,0,12"
+                          Background="{DynamicResource ClaudeInputBg}" Foreground="{DynamicResource ClaudeText}"/>
+
+                <TextBlock Text="认证字段" Foreground="{DynamicResource ClaudeTextSecondary}" Margin="0,0,0,6"/>
+                <TextBox Text="{Binding AuthHeader, UpdateSourceTrigger=PropertyChanged}"
+                         Background="{DynamicResource ClaudeInputBg}" Foreground="{DynamicResource ClaudeText}"
+                         Padding="10,8" Margin="0,0,0,12"/>
+
+                <TextBlock Text="认证前缀" Foreground="{DynamicResource ClaudeTextSecondary}" Margin="0,0,0,6"/>
+                <TextBox Text="{Binding AuthPrefix, UpdateSourceTrigger=PropertyChanged}"
+                         Background="{DynamicResource ClaudeInputBg}" Foreground="{DynamicResource ClaudeText}"
+                         Padding="10,8" Margin="0,0,0,12"/>
+
+                <TextBlock Text="模型列表（逗号分隔）" Foreground="{DynamicResource ClaudeTextSecondary}" Margin="0,0,0,6"/>
+                <TextBox Text="{Binding ModelsText, UpdateSourceTrigger=PropertyChanged}"
+                         Background="{DynamicResource ClaudeInputBg}" Foreground="{DynamicResource ClaudeText}"
+                         Padding="10,8" Margin="0,0,0,12" TextWrapping="Wrap"/>
+            </StackPanel>
+        </ScrollViewer>
+
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,8,0,0">
+            <TextBlock Text="{Binding StatusMessage}" VerticalAlignment="Center" Margin="0,0,12,0"
+                       Foreground="{DynamicResource ClaudeSuccess}" TextWrapping="Wrap" MaxWidth="200"/>
+            <Button Content="测试并获取模型" Command="{Binding TestConnectionCommand}"
+                    Style="{DynamicResource ClaudeButtonSecondary}" Margin="0,0,8,0"/>
+            <Button Content="取消" Command="{Binding CancelCommand}"
+                    Style="{DynamicResource ClaudeButtonSecondary}" Margin="0,0,8,0"/>
+            <Button Content="保存" Command="{Binding SaveCommand}"
+                    Style="{DynamicResource ClaudeButtonPrimary}"/>
+        </StackPanel>
+    </Grid>
+</Window>

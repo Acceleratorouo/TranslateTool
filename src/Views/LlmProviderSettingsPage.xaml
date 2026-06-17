@@ -1,0 +1,102 @@
+<UserControl x:Class="TranslateTool.Views.LlmProviderSettingsPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Background="{DynamicResource ClaudeBg}">
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" Text="AI 翻译设置"
+                   FontSize="20" FontWeight="Bold" Foreground="{DynamicResource ClaudeText}"
+                   Margin="0,0,0,8"/>
+        <TextBlock Grid.Row="1" Text="选择 AI 引擎时生效。默认使用本地 Gemma 4 E4B，也可添加其他在线或本地供应商。"
+                   FontSize="12" Foreground="{DynamicResource ClaudeTextMuted}" TextWrapping="Wrap"
+                   Margin="0,0,0,16"/>
+
+        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
+            <StackPanel>
+                <Border Background="{DynamicResource ClaudeSurface}" BorderBrush="{DynamicResource ClaudeBorder}"
+                        BorderThickness="1" CornerRadius="10" Padding="16" Margin="0,0,0,14">
+                    <StackPanel>
+                        <TextBlock Text="供应商" FontSize="15" FontWeight="SemiBold" Foreground="{DynamicResource ClaudeText}" Margin="0,0,0,12"/>
+
+                        <ItemsControl ItemsSource="{Binding Providers}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="0,0,0,8">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Grid.Column="0">
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="{Binding DisplayName}" FontWeight="Medium" Foreground="{DynamicResource ClaudeText}"/>
+                                                <TextBlock Text="（默认）" Foreground="{DynamicResource ClaudeSuccess}" Margin="6,0,0,0"
+                                                           Visibility="{Binding IsDefault, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                                            </StackPanel>
+                                            <TextBlock Text="{Binding BaseUrl}" FontSize="11" Foreground="{DynamicResource ClaudeTextMuted}"/>
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                            <Button Content="编辑" Command="{Binding DataContext.EditProviderCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                    CommandParameter="{Binding}" Style="{DynamicResource ClaudeButtonSecondary}" Margin="0,0,4,0"/>
+                                            <Button Content="默认" Command="{Binding DataContext.SetDefaultProviderCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                    CommandParameter="{Binding}" Style="{DynamicResource ClaudeButtonSecondary}" Margin="0,0,4,0"/>
+                                            <Button Content="删除" Command="{Binding DataContext.DeleteProviderCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                    CommandParameter="{Binding}" Style="{DynamicResource ClaudeButtonDanger}"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
+                            <Button Content="从模板添加" Command="{Binding AddFromTemplateCommand}"
+                                    Style="{DynamicResource ClaudeButtonSecondary}" Margin="0,0,8,0"/>
+                            <Button Content="自定义添加" Command="{Binding AddCustomCommand}"
+                                    Style="{DynamicResource ClaudeButtonSecondary}" Margin="0,0,8,0"/>
+                            <Button Content="部署本地 Gemma 4 E4B" Command="{Binding DeployLocalGemmaCommand}"
+                                    Style="{DynamicResource ClaudeButtonPrimary}"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <Border Background="{DynamicResource ClaudeSurface}" BorderBrush="{DynamicResource ClaudeBorder}"
+                        BorderThickness="1" CornerRadius="10" Padding="16" Margin="0,0,0,14">
+                    <StackPanel>
+                        <TextBlock Text="AI 翻译参数" FontSize="15" FontWeight="SemiBold" Foreground="{DynamicResource ClaudeText}" Margin="0,0,0,12"/>
+
+                        <TextBlock Text="系统提示词" Foreground="{DynamicResource ClaudeTextSecondary}" Margin="0,0,0,6"/>
+                        <TextBox Text="{Binding SystemPrompt, UpdateSourceTrigger=PropertyChanged}"
+                                 Background="{DynamicResource ClaudeInputBg}" Foreground="{DynamicResource ClaudeText}"
+                                 Padding="10,8" Margin="0,0,0,12" TextWrapping="Wrap" AcceptsReturn="True" Height="80"/>
+
+                        <TextBlock Text="温度" Foreground="{DynamicResource ClaudeTextSecondary}" Margin="0,0,0,6"/>
+                        <Slider Minimum="0" Maximum="1" TickFrequency="0.1" Value="{Binding Temperature}"
+                                Margin="0,0,0,12"/>
+
+                        <TextBlock Text="最大 Token" Foreground="{DynamicResource ClaudeTextSecondary}" Margin="0,0,0,6"/>
+                        <TextBox Text="{Binding MaxTokens, UpdateSourceTrigger=PropertyChanged}"
+                                 Background="{DynamicResource ClaudeInputBg}" Foreground="{DynamicResource ClaudeText}"
+                                 Padding="10,8" Margin="0,0,0,12"/>
+
+                        <TextBlock Text="超时秒数" Foreground="{DynamicResource ClaudeTextSecondary}" Margin="0,0,0,6"/>
+                        <TextBox Text="{Binding TimeoutSeconds, UpdateSourceTrigger=PropertyChanged}"
+                                 Background="{DynamicResource ClaudeInputBg}" Foreground="{DynamicResource ClaudeText}"
+                                 Padding="10,8" Margin="0,0,0,12"/>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
+            <TextBlock Text="{Binding StatusMessage}" VerticalAlignment="Center" Margin="0,0,12,0"
+                       Foreground="{DynamicResource ClaudeSuccess}"/>
+            <Button Content="保存" Command="{Binding SaveSettingsCommand}"
+                    Style="{DynamicResource ClaudeButtonPrimary}"/>
+        </StackPanel>
+    </Grid>
+</UserControl>
