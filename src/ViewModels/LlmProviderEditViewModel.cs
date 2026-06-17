@@ -36,6 +36,9 @@ public partial class LlmProviderEditViewModel : ObservableObject
     private string _modelsText = "";
 
     [ObservableProperty]
+    private bool _isEnabled = true;
+
+    [ObservableProperty]
     private string _statusMessage = "";
 
     public LlmProvider? EditingProvider { get; }
@@ -56,6 +59,7 @@ public partial class LlmProviderEditViewModel : ObservableObject
             AuthHeader = provider.AuthHeader;
             AuthPrefix = provider.AuthPrefix;
             ModelsText = string.Join(", ", provider.Models);
+            IsEnabled = provider.IsEnabled;
         }
     }
 
@@ -134,8 +138,8 @@ public partial class LlmProviderEditViewModel : ObservableObject
             .Select(m => m.Trim())
             .Where(m => !string.IsNullOrWhiteSpace(m))
             .ToList();
-        provider.IsEnabled = EditingProvider?.IsEnabled ?? true;
-        provider.IsDefault = EditingProvider?.IsDefault ?? false;
+        provider.IsEnabled = IsEnabled;
+        provider.IsDefault = isExistingEdit ? EditingProvider!.IsDefault : false;
 
         return provider;
     }

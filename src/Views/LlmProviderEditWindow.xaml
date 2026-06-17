@@ -59,6 +59,10 @@
                 <TextBox Text="{Binding ModelsText, UpdateSourceTrigger=PropertyChanged}"
                          Background="{DynamicResource ClaudeInputBg}" Foreground="{DynamicResource ClaudeText}"
                          Padding="10,8" Margin="0,0,0,12" TextWrapping="Wrap"/>
+
+                <CheckBox IsChecked="{Binding IsEnabled}" Margin="0,0,0,12">
+                    <TextBlock Text="启用此供应商" Foreground="{DynamicResource ClaudeTextSecondary}"/>
+                </CheckBox>
             </StackPanel>
         </ScrollViewer>
 
