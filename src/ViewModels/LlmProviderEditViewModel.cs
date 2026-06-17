@@ -8,6 +8,28 @@ namespace TranslateTool.ViewModels;
 
 public partial class LlmProviderEditViewModel : ObservableObject
 {
+    /// <summary>
+    /// API 格式友好名称与枚举值的双向映射。
+    /// </summary>
+    private static readonly Dictionary<string, LlmApiFormat> ApiFormatMap = new()
+    {
+        { "OpenAI 兼容", LlmApiFormat.OpenAiCompatible },
+        { "Ollama", LlmApiFormat.Ollama },
+        { "Gemini (暂不支持)", LlmApiFormat.Gemini },
+        { "Anthropic Messages (原生)", LlmApiFormat.Anthropic }
+    };
+
+    /// <summary>
+    /// 各 API 格式对应的默认认证字段。
+    /// </summary>
+    private static readonly Dictionary<LlmApiFormat, (string Header, string Prefix)> AuthDefaults = new()
+    {
+        { LlmApiFormat.OpenAiCompatible, ("Authorization", "Bearer") },
+        { LlmApiFormat.Ollama, ("Authorization", "Bearer") },
+        { LlmApiFormat.Gemini, ("Authorization", "Bearer") },
+        { LlmApiFormat.Anthropic, ("x-api-key", "") }
+    };
+
     [ObservableProperty]
     private string _displayName = "";
 
@@ -24,7 +46,7 @@ public partial class LlmProviderEditViewModel : ObservableObject
     private string _apiKey = "";
 
     [ObservableProperty]
-    private string _apiFormat = "OpenAiCompatible";
+    private string _apiFormat = "OpenAI 兼容";
 
     [ObservableProperty]
     private string _authHeader = "Authorization";
@@ -43,7 +65,7 @@ public partial class LlmProviderEditViewModel : ObservableObject
 
     public LlmProvider? EditingProvider { get; }
 
-    public ObservableCollection<string> ApiFormatOptions { get; } = new() { "OpenAiCompatible", "Ollama", "Gemini", "Anthropic" };
+    public ObservableCollection<string> ApiFormatOptions { get; } = new(ApiFormatMap.Keys);
 
     public LlmProviderEditViewModel(LlmProvider? provider = null)
     {
@@ -55,12 +77,25 @@ public partial class LlmProviderEditViewModel : ObservableObject
             HomepageUrl = provider.HomepageUrl ?? "";
             BaseUrl = provider.BaseUrl;
             ApiKey = provider.ApiKey ?? "";
-            ApiFormat = provider.ApiFormat.ToString();
+            ApiFormat = ApiFormatMap.FirstOrDefault(kv => kv.Value == provider.ApiFormat).Key ?? "OpenAI 兼容";
             AuthHeader = provider.AuthHeader;
             AuthPrefix = provider.AuthPrefix;
             ModelsText = string.Join(", ", provider.Models);
             IsEnabled = provider.IsEnabled;
         }
+    }
+
+    /// <summary>
+    /// 当 API 格式变化时，自动更新认证字段为该格式的默认值。
+    /// </summary>
+    partial void OnApiFormatChanged(string value)
+    {
+        if (string.IsNullOrEmpty(value)) return;
+        if (!ApiFormatMap.TryGetValue(value, out var fmt)) return;
+        if (!AuthDefaults.TryGetValue(fmt, out var auth)) return;
+
+        AuthHeader = auth.Header;
+        AuthPrefix = auth.Prefix;
     }
 
     [RelayCommand(AllowConcurrentExecutions = false)]
@@ -128,7 +163,7 @@ public partial class LlmProviderEditViewModel : ObservableObject
         provider.HomepageUrl = string.IsNullOrWhiteSpace(HomepageUrl) ? null : HomepageUrl.Trim();
         provider.BaseUrl = BaseUrl.Trim();
         provider.ApiKey = string.IsNullOrWhiteSpace(ApiKey) ? null : ApiKey.Trim();
-        provider.ApiFormat = Enum.TryParse<LlmApiFormat>(ApiFormat, ignoreCase: true, out var fmt)
+        provider.ApiFormat = ApiFormatMap.TryGetValue(ApiFormat, out var fmt)
             ? fmt
             : LlmApiFormat.OpenAiCompatible;
         provider.AuthHeader = string.IsNullOrWhiteSpace(AuthHeader) ? "Authorization" : AuthHeader.Trim();

@@ -10,24 +10,13 @@ namespace TranslateTool.Services;
 ///
 /// 提供的核心能力：
 /// - <see cref="ChatCompletionAsync"/>：发起 /v1/messages 请求并返回文本结果
-/// - <see cref="ListModelsAsync"/>：返回 Anthropic 当前可用模型列表（Anthropic 不提供 /models 端点）
+/// - <see cref="ListModelsAsync"/>：请求 GET /v1/models 获取服务端可用模型列表
 ///
 /// 构造时会根据 <see cref="LlmProvider"/> 配置设置 BaseAddress 与 x-api-key 鉴权头。
 /// </summary>
 public class AnthropicClient : ILlmClient, IDisposable
 {
     private const string AnthropicVersion = "2023-06-01";
-
-    private static readonly string[] KnownModels =
-    {
-        "claude-opus-4-0-20250514",
-        "claude-sonnet-4-0-20250514",
-        "claude-3-7-sonnet-20250219",
-        "claude-3-5-sonnet-20241022",
-        "claude-3-5-haiku-20241022",
-        "claude-3-opus-20240229",
-        "claude-3-haiku-20240307"
-    };
 
     private readonly HttpClient _client;
 
@@ -134,15 +123,48 @@ public class AnthropicClient : ILlmClient, IDisposable
     }
 
     /// <summary>
-    /// 返回 Anthropic 当前可用模型列表。
-    /// 注意：Anthropic 不提供 /models 端点，这里返回硬编码的已知模型列表。
+    /// 请求 GET /v1/models 获取 Anthropic 服务端可用模型列表。
+    /// Anthropic Models API 返回格式与 OpenAI 类似：{ "data": [{ "id": "..." }] }。
     /// </summary>
     /// <param name="ct">取消令牌。</param>
-    /// <returns>已知模型 Id 列表。</returns>
-    public Task<IReadOnlyList<string>> ListModelsAsync(CancellationToken ct = default)
+    /// <returns>模型 Id 列表，已过滤空白项。</returns>
+    /// <exception cref="HttpRequestException">当 API 请求返回非成功状态码时抛出，异常消息包含响应体。</exception>
+    /// <exception cref="InvalidOperationException">当 API 返回的响应无法解析为 JSON 时抛出。</exception>
+    public async Task<IReadOnlyList<string>> ListModelsAsync(CancellationToken ct = default)
     {
-        IReadOnlyList<string> models = KnownModels;
-        return Task.FromResult(models);
+        var response = await _client.GetAsync("models", ct);
+        if (!response.IsSuccessStatusCode)
+        {
+            var errorBody = await response.Content.ReadAsStringAsync(ct);
+            throw new HttpRequestException($"Anthropic API 请求失败: {response.StatusCode} - {errorBody}");
+        }
+
+        var json = await response.Content.ReadAsStringAsync(ct);
+        JsonDocument doc;
+        try
+        {
+            doc = JsonDocument.Parse(json);
+        }
+        catch (JsonException ex)
+        {
+            throw new InvalidOperationException($"Anthropic API 返回了无法解析的响应: {json[..Math.Min(200, json.Length)]}", ex);
+        }
+        using (doc)
+        {
+            var models = new List<string>();
+            if (doc.RootElement.TryGetProperty("data", out var data) && data.ValueKind == JsonValueKind.Array)
+            {
+                foreach (var item in data.EnumerateArray())
+                {
+                    if (item.TryGetProperty("id", out var id))
+                    {
+                        models.Add(id.GetString() ?? "");
+                    }
+                }
+            }
+
+            return models.Where(m => !string.IsNullOrWhiteSpace(m)).ToList();
+        }
     }
 
     /// <inheritdoc />
