@@ -1,5 +1,5 @@
 PackageIdentifier: TranslateTool.TranslateTool
-PackageVersion: 1.0.0
+PackageVersion: 1.1.0
 PackageLocale: en-US
 Publisher: TranslateTool
 PackageName: TranslateTool
@@ -19,7 +19,7 @@ ManifestVersion: 1.6.0
 Installers:
 - Architecture: x64
   InstallerType: inno
-  InstallerUrl: https://github.com/TranslateTool/TranslateTool/releases/download/v1.0.0/TranslateTool_Setup_1.0.0.exe
+  InstallerUrl: https://github.com/TranslateTool/TranslateTool/releases/download/v1.1.0/TranslateTool_Setup_1.1.0.exe
   InstallerSha256: 0000000000000000000000000000000000000000000000000000000000000000
   SignatureSha256: 0000000000000000000000000000000000000000000000000000000000000000
   UpgradeBehavior: install
@@ -31,7 +31,7 @@ Commands:
 - TranslateTool.exe
 AppsAndFeaturesEntries:
 - DisplayName: TranslateTool
-  DisplayVersion: 1.0.0
+  DisplayVersion: 1.1.0
   Publisher: TranslateTool
   ProductCode: '{{E8A3B5C7-D4F6-4A9B-8C2D-1E3F5A7B9C0D}'
 ReleaseDate: 2026-06-17
@@ -46,9 +46,11 @@ Uninstallers:
   Type: inno
   SilentUninstallString: '"$InnoSetupExePath$" /SILENT /CURRENTUSER /SP-'
 ReleaseNotes: |
-  - Initial release
-  - 4 translation engines (Baidu, Google, Microsoft, DeepL)
-  - Clipboard auto-translate, region OCR, file translation
-  - Multi-engine comparison
-  - Dark/light theme, RTL support, accessibility
-  - GDPR-compliant local data storage
+  v1.1.0
+  - Translation result Toast notification
+  - Word selection translation (Ctrl+Shift+X)
+  - Floating window edge docking
+  - Multi-engine result auto-scoring with "best result" recommendation
+  - Independent switches for new features in settings
+  - Global hotkey conflict detection
+  - Scoring model tuning based on user feedback

@@ -11,7 +11,7 @@ public class UpdateService
 {
     private static readonly HttpClient Client = HttpShared.Client;
     private const string UpdateCheckUrl = "https://api.github.com/repos/TranslateTool/TranslateTool/releases/latest";
-    private const string CurrentVersion = "1.0.0";
+    private const string CurrentVersion = "1.1.0";
 
     /// <summary>
     /// 检查更新

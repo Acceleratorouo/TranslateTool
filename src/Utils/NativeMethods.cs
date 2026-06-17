@@ -4,7 +4,7 @@ namespace TranslateTool.Utils;
 
 public static class NativeMethods
 {
-    [DllImport("user32.dll")]
+    [DllImport("user32.dll", SetLastError = true)]
     public static extern bool RegisterHotKey(IntPtr hWnd, int id,
         UInt32 fsModifiers, UInt32 vk);
 
@@ -30,4 +30,16 @@ public static class NativeMethods
     // 虚拟键码
     public const uint VK_X = 0x58;
     public const uint VK_T = 0x54;
+
+    // 系统错误码
+    public const uint ERROR_HOTKEY_ALREADY_REGISTERED = 1409;
+
+    public static string GetHotKeyErrorMessage(uint errorCode)
+    {
+        return errorCode switch
+        {
+            ERROR_HOTKEY_ALREADY_REGISTERED => "该热键已被其他程序占用（如输入法、截图工具等）。",
+            _ => $"注册热键失败，系统错误码：{errorCode}"
+        };
+    }
 }

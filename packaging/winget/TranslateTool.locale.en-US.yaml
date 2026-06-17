@@ -1,5 +1,5 @@
 PackageIdentifier: TranslateTool.TranslateTool
-PackageVersion: 1.0.0
+PackageVersion: 1.1.0
 PackageLocale: en-US
 Publisher: TranslateTool
 PackageName: TranslateTool
@@ -36,9 +36,11 @@ Tags:
 ManifestType: defaultLocale
 ManifestVersion: 1.6.0
 ReleaseNotes: |
-  - Initial release
-  - 4 translation engines
-  - Clipboard auto-translate, region OCR, file translation
-  - Multi-engine comparison
-  - Dark/light theme, RTL support, accessibility
-  - GDPR-compliant local data storage
+  v1.1.0
+  - Translation result Toast notification
+  - Word selection translation (Ctrl+Shift+X)
+  - Floating window edge docking
+  - Multi-engine result auto-scoring with "best result" recommendation
+  - Independent switches for new features in settings
+  - Global hotkey conflict detection
+  - Scoring model tuning based on user feedback

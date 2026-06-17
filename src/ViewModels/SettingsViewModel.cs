@@ -27,6 +27,15 @@ public partial class SettingsViewModel : ObservableObject
     [ObservableProperty]
     private string _statusMessage = "";
 
+    [ObservableProperty]
+    private bool _showToastOnTranslate = true;
+
+    [ObservableProperty]
+    private bool _enableSelectionTranslate = true;
+
+    [ObservableProperty]
+    private bool _enableDockHide = true;
+
     public SettingsViewModel()
     {
         _settings = AppSettings.Current;
@@ -37,6 +46,27 @@ public partial class SettingsViewModel : ObservableObject
         _deepLApiKey = _settings.DeepLApiKey ?? "";
         _hotkeyModifiers = _settings.HotkeyModifiers ?? "Ctrl+Shift";
         _hotkeyKey = _settings.HotkeyKey ?? "T";
+        _showToastOnTranslate = _settings.ShowToastOnTranslate;
+        _enableSelectionTranslate = _settings.EnableSelectionTranslate;
+        _enableDockHide = _settings.EnableDockHide;
+    }
+
+    partial void OnShowToastOnTranslateChanged(bool value)
+    {
+        _settings.ShowToastOnTranslate = value;
+        _settings.Save();
+    }
+
+    partial void OnEnableSelectionTranslateChanged(bool value)
+    {
+        _settings.EnableSelectionTranslate = value;
+        _settings.Save();
+    }
+
+    partial void OnEnableDockHideChanged(bool value)
+    {
+        _settings.EnableDockHide = value;
+        _settings.Save();
     }
 
     [RelayCommand]

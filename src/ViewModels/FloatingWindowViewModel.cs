@@ -85,6 +85,10 @@ public partial class FloatingWindowViewModel : ObservableObject
     private string _translatedResultText = "";
     private string _translatedEngineName = "";
 
+    // 保存最近一次用于评分的源文本与完整源文本
+    private string _lastFullSourceText = "";
+    private string _lastComparisonSource = "";
+
     public AppSettings Settings { get; } = AppSettings.Current;
 
     /// <summary>
@@ -125,6 +129,7 @@ public partial class FloatingWindowViewModel : ObservableObject
     public IRelayCommand ToggleComparisonCommand { get; }
     public IRelayCommand SwapLanguagesCommand { get; }
     public IRelayCommand<string> SwitchLanguageCommand { get; }
+    public IRelayCommand<string> VoteResultCommand { get; }
 
     public FloatingWindowViewModel()
     {
@@ -143,6 +148,7 @@ public partial class FloatingWindowViewModel : ObservableObject
         ToggleComparisonCommand = new RelayCommand(() => ShowComparison = !ShowComparison);
         SwapLanguagesCommand = new RelayCommand(ExecuteSwapLanguages);
         SwitchLanguageCommand = new RelayCommand<string>(ExecuteSwitchLanguage);
+        VoteResultCommand = new RelayCommand<string>(ExecuteVoteResult);
 
         LoadHistory();
         StartClipboardMonitor();
@@ -463,6 +469,7 @@ public partial class FloatingWindowViewModel : ObservableObject
 
     private async Task DoTranslate(string text)
     {
+        _lastFullSourceText = text;
         IsBusy = true;
         try
         {
@@ -725,6 +732,74 @@ public partial class FloatingWindowViewModel : ObservableObject
     }
 
     /// <summary>
+    /// 记录用户对某个引擎结果的赞/踩反馈
+    /// </summary>
+    private void ExecuteVoteResult(string? parameter)
+    {
+        if (string.IsNullOrWhiteSpace(parameter))
+        {
+            return;
+        }
+
+        var parts = parameter.Split('|', StringSplitOptions.RemoveEmptyEntries);
+        if (parts.Length != 2 || !int.TryParse(parts[1], out int vote))
+        {
+            return;
+        }
+
+        var engine = parts[0];
+        var result = ComparisonResults.FirstOrDefault(r =>
+            r.EngineName.Equals(engine, StringComparison.OrdinalIgnoreCase));
+        if (result is null)
+        {
+            return;
+        }
+
+        var source = !string.IsNullOrEmpty(_lastComparisonSource)
+            ? _lastComparisonSource
+            : SourceText;
+
+        var entry = new TranslationFeedbackEntry
+        {
+            SourceHash = TranslationFeedbackService.ComputeSourceHash(source),
+            Engine = result.EngineName,
+            Translation = result.TranslatedText,
+            Vote = vote,
+            Timestamp = DateTime.UtcNow
+        };
+
+        TranslationFeedbackService.SaveFeedback(entry);
+
+        // 反馈可能改变引擎声誉，重新计算所有对比结果的分数
+        if (!string.IsNullOrEmpty(source))
+        {
+            var allTranslations = ComparisonResults
+                .Where(r => r.IsSuccess)
+                .Select(r => r.TranslatedText)
+                .ToList();
+
+            foreach (var item in ComparisonResults)
+            {
+                if (item.IsSuccess)
+                {
+                    var scoringResult = TranslationScoringService.ScoreResult(
+                        source,
+                        item.TranslatedText,
+                        allTranslations,
+                        Settings.ScoreWeightLength,
+                        Settings.ScoreWeightDiversity,
+                        Settings.ScoreWeightFormat,
+                        Settings.ScoreWeightSmoothness,
+                        Settings.ScoreWeightRejection,
+                        item.EngineName);
+                    item.Score = scoringResult.Score;
+                    item.ScoreReason = string.Join("；", scoringResult.Reasons);
+                }
+            }
+        }
+    }
+
+    /// <summary>
     /// 执行多引擎对比翻译
     /// </summary>
     private async Task ExecuteCompareEngines()
@@ -773,7 +848,10 @@ public partial class FloatingWindowViewModel : ObservableObject
             var results = await Task.WhenAll(tasks);
 
             // 将源文本传递给评分服务（用于获取原文预览）
-            var sourceForScoring = SourceText.Length > 100 ? SourceText[..100] : SourceText;
+            var sourceForScoring = !string.IsNullOrEmpty(_lastFullSourceText)
+                ? _lastFullSourceText
+                : SourceText;
+            _lastComparisonSource = sourceForScoring;
 
             // 计算所有翻译文本用于多样性评分
             var allTranslations = results
@@ -789,7 +867,13 @@ public partial class FloatingWindowViewModel : ObservableObject
                     var scoringResult = TranslationScoringService.ScoreResult(
                         sourceForScoring,
                         result.TranslatedText,
-                        allTranslations);
+                        allTranslations,
+                        Settings.ScoreWeightLength,
+                        Settings.ScoreWeightDiversity,
+                        Settings.ScoreWeightFormat,
+                        Settings.ScoreWeightSmoothness,
+                        Settings.ScoreWeightRejection,
+                        result.EngineName);
                     result.Score = scoringResult.Score;
                     result.ScoreReason = string.Join("；", scoringResult.Reasons);
                 }

@@ -318,7 +318,7 @@
                                                                    AutomationProperties.Name="引擎译文"
                                                                    AutomationProperties.LiveSetting="Polite"/>
 
-                                                        <!-- 评分显示 -->
+                                                        <!-- 评分显示 + 反馈按钮 -->
                                                         <StackPanel Grid.Column="2"
                                                                     Orientation="Horizontal"
                                                                     VerticalAlignment="Top"
@@ -331,6 +331,24 @@
                                                                        FontSize="11"
                                                                        Foreground="{DynamicResource ClaudeTextMuted}"
                                                                        Margin="2,0,0,0"/>
+                                                            <Button Content="👍"
+                                                                    Style="{DynamicResource ClaudeWindowButton}"
+                                                                    Command="{Binding DataContext.VoteResultCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                                    CommandParameter="{Binding EngineName, StringFormat='{}{0}|1'}"
+                                                                    ToolTip="赞"
+                                                                    FontSize="12"
+                                                                    Margin="8,0,0,0"
+                                                                    Padding="4,0"
+                                                                    AutomationProperties.Name="赞"/>
+                                                            <Button Content="👎"
+                                                                    Style="{DynamicResource ClaudeWindowButton}"
+                                                                    Command="{Binding DataContext.VoteResultCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                                    CommandParameter="{Binding EngineName, StringFormat='{}{0}|-1'}"
+                                                                    ToolTip="踩"
+                                                                    FontSize="12"
+                                                                    Margin="4,0,0,0"
+                                                                    Padding="4,0"
+                                                                    AutomationProperties.Name="踩"/>
                                                         </StackPanel>
                                                     </Grid>
                                                 </Border>

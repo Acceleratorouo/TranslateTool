@@ -3,7 +3,7 @@
 
 #define MyAppName "翻译工具"
 #define MyAppNameEn "TranslateTool"
-#define MyAppVersion "1.0.0"
+#define MyAppVersion "1.1.0"
 #define MyAppPublisher "TranslateTool"
 #define MyAppURL "https://github.com/TranslateTool"
 #define MyAppExeName "TranslateTool.exe"

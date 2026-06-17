@@ -175,6 +175,31 @@
                                 AutomationProperties.HelpText="清除所有设置、历史和缓存（不可撤销）"/>
                     </StackPanel>
                 </Border>
+
+                <Border Style="{StaticResource SectionCard}">
+                    <StackPanel>
+                        <TextBlock Style="{StaticResource SectionHeader}" Text="v1.1 新功能"/>
+                        <TextBlock Style="{StaticResource SectionDesc}" Text="控制 v1.1 版本新增功能的行为"/>
+
+                        <CheckBox IsChecked="{Binding ShowToastOnTranslate}" Margin="0,0,0,10"
+                                  AutomationProperties.Name="复制翻译时显示右下角气泡提示"
+                                  AutomationProperties.HelpText="开启后，复制翻译结果时会在屏幕右下角显示气泡提示">
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="复制翻译时显示右下角气泡提示" Margin="0"/>
+                        </CheckBox>
+
+                        <CheckBox IsChecked="{Binding EnableSelectionTranslate}" Margin="0,0,0,10"
+                                  AutomationProperties.Name="启用 Ctrl+Shift+X 划词翻译"
+                                  AutomationProperties.HelpText="开启后，选中文字并按 Ctrl+Shift+X 即可翻译所选内容">
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="启用 Ctrl+Shift+X 划词翻译" Margin="0"/>
+                        </CheckBox>
+
+                        <CheckBox IsChecked="{Binding EnableDockHide}"
+                                  AutomationProperties.Name="悬浮窗拖到屏幕边缘自动贴边隐藏"
+                                  AutomationProperties.HelpText="开启后，将悬浮窗拖到屏幕边缘会自动贴边隐藏">
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="悬浮窗拖到屏幕边缘自动贴边隐藏" Margin="0"/>
+                        </CheckBox>
+                    </StackPanel>
+                </Border>
             </StackPanel>
         </ScrollViewer>
 

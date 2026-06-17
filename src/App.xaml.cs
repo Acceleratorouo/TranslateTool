@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Interop;
@@ -35,6 +36,9 @@ public partial class App : System.Windows.Application
 
         // 加载翻译缓存
         TranslationCache.Load();
+
+        // 加载历史反馈数据（用于引擎声誉评分）
+        TranslationFeedbackService.Load();
 
         // 应用已保存的 API 密钥
         var settings = AppSettings.Current;
@@ -82,18 +86,20 @@ public partial class App : System.Windows.Application
         var hwndSource = HwndSource.FromHwnd(_floatingWindowHandle);
         hwndSource?.AddHook(WndProcHook);
 
-        NativeMethods.RegisterHotKey(
+        RegisterHotKeyWithErrorHandling(
             _floatingWindowHandle,
             NativeMethods.HOTKEY_TOGGLE_WINDOW,
-            NativeMethods.ModControl | NativeMethods.ModShift,
-            NativeMethods.VK_T);
+            (uint)(NativeMethods.ModControl | NativeMethods.ModShift),
+            NativeMethods.VK_T,
+            "Ctrl+Shift+T（显示/隐藏悬浮窗）");
 
         // 注册划词翻译热键 Ctrl+Shift+X
-        NativeMethods.RegisterHotKey(
+        RegisterHotKeyWithErrorHandling(
             _floatingWindowHandle,
             NativeMethods.HOTKEY_SELECTION_TRANSLATE,
-            NativeMethods.ModControl | NativeMethods.ModShift,
-            NativeMethods.VK_X);
+            (uint)(NativeMethods.ModControl | NativeMethods.ModShift),
+            NativeMethods.VK_X,
+            "Ctrl+Shift+X（划词翻译）");
 
         // 创建托盘图标
         var iconPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "TranslateTool.ico");
@@ -324,6 +330,32 @@ public partial class App : System.Windows.Application
 
         _notifyIcon?.Dispose();
         base.OnExit(e);
+    }
+
+    private static void RegisterHotKeyWithErrorHandling(
+        IntPtr hWnd,
+        int id,
+        uint modifiers,
+        uint vk,
+        string hotkeyDisplayName)
+    {
+        if (NativeMethods.RegisterHotKey(hWnd, id, modifiers, vk))
+        {
+            return;
+        }
+
+        var errorCode = (uint)Marshal.GetLastWin32Error();
+        var errorMessage = NativeMethods.GetHotKeyErrorMessage(errorCode);
+        var fullMessage = $"{hotkeyDisplayName}注册失败：{errorMessage}\n\n请在设置中更换热键后重启应用。";
+
+        System.Diagnostics.Debug.WriteLine(
+            $"RegisterHotKey failed for {hotkeyDisplayName}. Error code: {errorCode}");
+
+        System.Windows.MessageBox.Show(
+            fullMessage,
+            "热键注册失败",
+            MessageBoxButton.OK,
+            MessageBoxImage.Warning);
     }
 
     private static void ShowFloatingWindow()

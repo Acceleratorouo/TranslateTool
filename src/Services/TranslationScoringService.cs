@@ -8,13 +8,13 @@ namespace TranslateTool.Services;
 public static class TranslationScoringService
 {
     /// <summary>
-    /// 评分维度权重
+    /// 默认评分维度权重
     /// </summary>
-    private const double LengthWeight = 0.30;
-    private const double DiversityWeight = 0.25;
-    private const double FormatWeight = 0.20;
-    private const double SmoothnessWeight = 0.15;
-    private const double RejectionWeight = 0.10;
+    private const double DefaultLengthWeight = 0.30;
+    private const double DefaultDiversityWeight = 0.25;
+    private const double DefaultFormatWeight = 0.20;
+    private const double DefaultSmoothnessWeight = 0.15;
+    private const double DefaultRejectionWeight = 0.10;
 
     /// <summary>
     /// 为翻译结果打分（0-100）
@@ -22,9 +22,21 @@ public static class TranslationScoringService
     /// <param name="sourceText">源文本</param>
     /// <param name="translatedText">翻译文本</param>
     /// <param name="allTranslations">所有引擎的翻译结果</param>
+    /// <param name="weightLength">长度比权重</param>
+    /// <param name="weightDiversity">多样性权重</param>
+    /// <param name="weightFormat">格式完整性权重</param>
+    /// <param name="weightSmoothness">平滑度权重</param>
+    /// <param name="weightRejection">拒绝分权重</param>
+    /// <param name="engine">当前翻译引擎（用于声誉调整）</param>
     /// <returns>评分结果</returns>
     public static ScoringResult ScoreResult(string sourceText, string translatedText,
-        IReadOnlyList<string> allTranslations)
+        IReadOnlyList<string> allTranslations,
+        int weightLength = 30,
+        int weightDiversity = 25,
+        int weightFormat = 20,
+        int weightSmoothness = 15,
+        int weightRejection = 10,
+        string? engine = null)
     {
         if (string.IsNullOrEmpty(translatedText))
         {
@@ -35,28 +47,34 @@ public static class TranslationScoringService
             };
         }
 
+        var (lengthW, diversityW, formatW, smoothnessW, rejectionW) = NormalizeWeights(
+            weightLength, weightDiversity, weightFormat, weightSmoothness, weightRejection);
+
         var reasons = new List<string>();
         double totalScore = 0;
 
-        // 1. 长度比评分（30%）
+        // 1. 长度比评分
         double lengthScore = ScoreLength(sourceText, translatedText, reasons);
-        totalScore += lengthScore * LengthWeight;
+        totalScore += lengthScore * lengthW;
 
-        // 2. 多样性评分（25%）
+        // 2. 多样性评分
         double diversityScore = ScoreDiversity(translatedText, allTranslations, reasons);
-        totalScore += diversityScore * DiversityWeight;
+        totalScore += diversityScore * diversityW;
 
-        // 3. 格式完整性评分（20%）
+        // 3. 格式完整性评分
         double formatScore = ScoreFormat(translatedText, reasons);
-        totalScore += formatScore * FormatWeight;
+        totalScore += formatScore * formatW;
 
-        // 4. 平滑度评分（15%）
+        // 4. 平滑度评分
         double smoothnessScore = ScoreSmoothness(translatedText, reasons);
-        totalScore += smoothnessScore * SmoothnessWeight;
+        totalScore += smoothnessScore * smoothnessW;
 
-        // 5. 拒绝分检查（10%）
+        // 5. 拒绝分检查
         double rejectionPenalty = CalculateRejectionPenalty(translatedText, reasons);
-        totalScore -= rejectionPenalty * RejectionWeight;
+        totalScore -= rejectionPenalty * rejectionW;
+
+        // 6. 引擎声誉调整
+        totalScore = ApplyEngineReputationScore(engine, totalScore);
 
         // 确保分数在 0-100 范围内
         totalScore = Math.Max(0, Math.Min(100, totalScore));
@@ -67,6 +85,62 @@ public static class TranslationScoringService
             Reasons = reasons,
             IsRecommended = totalScore >= 80
         };
+    }
+
+    /// <summary>
+    /// 归一化权重。若权重总和不为 100，则按比例缩放。
+    /// </summary>
+    private static (double length, double diversity, double format, double smoothness, double rejection) NormalizeWeights(
+        int weightLength, int weightDiversity, int weightFormat, int weightSmoothness, int weightRejection)
+    {
+        int total = weightLength + weightDiversity + weightFormat + weightSmoothness + weightRejection;
+        if (total <= 0)
+        {
+            return (DefaultLengthWeight, DefaultDiversityWeight, DefaultFormatWeight, DefaultSmoothnessWeight, DefaultRejectionWeight);
+        }
+
+        double factor = 1.0 / total;
+        return (
+            weightLength * factor,
+            weightDiversity * factor,
+            weightFormat * factor,
+            weightSmoothness * factor,
+            weightRejection * factor
+        );
+    }
+
+    /// <summary>
+    /// 根据引擎历史反馈调整分数。
+    /// 历史赞多于踩 +5，踩多于赞 -5。
+    /// </summary>
+    public static double ApplyEngineReputationScore(string? engine, double score)
+    {
+        return ApplyEngineReputationScore(engine, score, TranslationFeedbackService.EngineReputation);
+    }
+
+    /// <summary>
+    /// 根据引擎历史反馈调整分数（可注入声誉字典，便于测试）。
+    /// </summary>
+    public static double ApplyEngineReputationScore(string? engine, double score, IReadOnlyDictionary<string, int> reputation)
+    {
+        if (string.IsNullOrEmpty(engine))
+        {
+            return score;
+        }
+
+        if (reputation.TryGetValue(engine.ToLowerInvariant(), out int netVote))
+        {
+            if (netVote > 0)
+            {
+                score += 5;
+            }
+            else if (netVote < 0)
+            {
+                score -= 5;
+            }
+        }
+
+        return score;
     }
 
     /// <summary>

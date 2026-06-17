@@ -230,4 +230,110 @@ public class TranslationScoringServiceTests
         // 未来年份应该被检测
         Assert.Contains(result.Reasons, r => r.Contains("数字") || r.Contains("异常"));
     }
+
+    [Fact]
+    public void ScoreResult_CustomWeights_AreNormalized()
+    {
+        var source = "Hello world";
+        var translation = "你好世界";
+        var allTranslations = new List<string> { translation };
+
+        // 仅保留长度权重，理想长度比应得高分
+        var lengthOnly = TranslationScoringService.ScoreResult(
+            source, translation, allTranslations,
+            weightLength: 100, weightDiversity: 0, weightFormat: 0, weightSmoothness: 0, weightRejection: 0);
+        Assert.True(lengthOnly.Score >= 95, $"Expected length-only score >= 95, got {lengthOnly.Score}");
+
+        // 仅保留多样性权重，单样本默认返回 80
+        var diversityOnly = TranslationScoringService.ScoreResult(
+            source, translation, allTranslations,
+            weightLength: 0, weightDiversity: 100, weightFormat: 0, weightSmoothness: 0, weightRejection: 0);
+        Assert.True(diversityOnly.Score >= 75 && diversityOnly.Score <= 85,
+            $"Expected diversity-only score around 80, got {diversityOnly.Score}");
+    }
+
+    [Fact]
+    public void ScoreResult_WeightsSumNot100_Normalized()
+    {
+        var source = "Hello world";
+        var translation = "你好世界";
+        var allTranslations = new List<string> { translation };
+
+        // 权重总和为 50，内部应归一化
+        var result = TranslationScoringService.ScoreResult(
+            source, translation, allTranslations,
+            weightLength: 15, weightDiversity: 12, weightFormat: 10, weightSmoothness: 8, weightRejection: 5);
+
+        Assert.True(result.Score >= 0 && result.Score <= 100,
+            $"Score should be in range, got {result.Score}");
+    }
+
+    [Fact]
+    public void ScoreResult_ZeroWeights_FallsBackToDefaults()
+    {
+        var source = "Hello world";
+        var translation = "你好世界";
+        var allTranslations = new List<string> { translation };
+
+        var result = TranslationScoringService.ScoreResult(
+            source, translation, allTranslations,
+            weightLength: 0, weightDiversity: 0, weightFormat: 0, weightSmoothness: 0, weightRejection: 0);
+
+        Assert.True(result.Score >= 0 && result.Score <= 100,
+            $"Score should be in range, got {result.Score}");
+    }
+
+    [Fact]
+    public void ApplyEngineReputationScore_PositiveNet_AddsBonus()
+    {
+        var reputation = new Dictionary<string, int> { { "baidu", 3 } };
+
+        var score = TranslationScoringService.ApplyEngineReputationScore("baidu", 70, reputation);
+
+        Assert.Equal(75, score);
+    }
+
+    [Fact]
+    public void ApplyEngineReputationScore_NegativeNet_SubtractsPenalty()
+    {
+        var reputation = new Dictionary<string, int> { { "google", -2 } };
+
+        var score = TranslationScoringService.ApplyEngineReputationScore("google", 70, reputation);
+
+        Assert.Equal(65, score);
+    }
+
+    [Fact]
+    public void ApplyEngineReputationScore_ZeroNet_NoChange()
+    {
+        var reputation = new Dictionary<string, int> { { "deepl", 0 } };
+
+        var score = TranslationScoringService.ApplyEngineReputationScore("deepl", 70, reputation);
+
+        Assert.Equal(70, score);
+    }
+
+    [Fact]
+    public void ApplyEngineReputationScore_UnknownEngine_NoChange()
+    {
+        var reputation = new Dictionary<string, int> { { "baidu", 3 } };
+
+        var score = TranslationScoringService.ApplyEngineReputationScore("microsoft", 70, reputation);
+
+        Assert.Equal(70, score);
+    }
+
+    [Fact]
+    public void ScoreResult_EngineParameter_NoCrashWhenReputationEmpty()
+    {
+        var source = "Hello world";
+        var translation = "你好世界";
+        var allTranslations = new List<string> { translation };
+
+        var result = TranslationScoringService.ScoreResult(
+            source, translation, allTranslations,
+            engine: "unknownengine");
+
+        Assert.True(result.Score >= 0 && result.Score <= 100);
+    }
 }

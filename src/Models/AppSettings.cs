@@ -51,6 +51,13 @@ public class AppSettings
     // 贴边隐藏开关（默认开启）
     public bool EnableDockHide { get; set; } = true;
 
+    // 多引擎评分权重（0-100，总和应为 100）
+    public int ScoreWeightLength { get; set; } = 30;
+    public int ScoreWeightDiversity { get; set; } = 25;
+    public int ScoreWeightFormat { get; set; } = 20;
+    public int ScoreWeightSmoothness { get; set; } = 15;
+    public int ScoreWeightRejection { get; set; } = 10;
+
     /// <summary>
     /// 从 JSON 文件加载设置
     /// </summary>
