@@ -40,6 +40,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="..\scripts\deploy-gemma4-e4b.ps1" CopyToOutputDirectory="PreserveNewest" Link="scripts\deploy-gemma4-e4b.ps1" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Resource Include="Resources\TranslateTool.ico" />
     <Content Include="Resources\TranslateTool.ico" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="Resources\TranslateTool.png" CopyToOutputDirectory="PreserveNewest" />
