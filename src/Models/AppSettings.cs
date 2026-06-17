@@ -42,6 +42,15 @@ public class AppSettings
     // 首次运行引导
     public bool FirstRunCompleted { get; set; } = false;
 
+    // Toast 提示设置（悬浮窗未显示时）
+    public bool ShowToastOnTranslate { get; set; } = true;
+
+    // 划词翻译开关（默认开启）
+    public bool EnableSelectionTranslate { get; set; } = true;
+
+    // 贴边隐藏开关（默认开启）
+    public bool EnableDockHide { get; set; } = true;
+
     /// <summary>
     /// 从 JSON 文件加载设置
     /// </summary>

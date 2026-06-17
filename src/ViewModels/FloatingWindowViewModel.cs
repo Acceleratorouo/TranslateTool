@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Text.Json;
+using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -10,6 +11,7 @@ using TranslateTool.Localization;
 using TranslateTool.Models;
 using TranslateTool.Services;
 using TranslateTool.Utils;
+using TranslateTool.Views;
 
 namespace TranslateTool.ViewModels;
 
@@ -37,6 +39,10 @@ public partial class FloatingWindowViewModel : ObservableObject
     private DispatcherTimer? _clipboardTimer;
     private string _lastClipboardText = "";
     private bool _isAutoTranslateEnabled = true;
+
+    // 划词翻译防抖
+    private DateTime _lastSelectionTranslateTime = DateTime.MinValue;
+    private const int SelectionTranslateDebounceMs = 500;
 
     [ObservableProperty]
     private string _resultText = IdleMessage;
@@ -70,6 +76,14 @@ public partial class FloatingWindowViewModel : ObservableObject
 
     [ObservableProperty]
     private bool _showComparison;
+
+    [ObservableProperty]
+    private bool _isWindowVisible;
+
+    // 保存翻译后的原始文本（用于 Toast 显示）
+    private string _translatedSourceText = "";
+    private string _translatedResultText = "";
+    private string _translatedEngineName = "";
 
     public AppSettings Settings { get; } = AppSettings.Current;
 
@@ -245,6 +259,114 @@ public partial class FloatingWindowViewModel : ObservableObject
         _ = DoTranslate(text);
     }
 
+    /// <summary>
+    /// 划词翻译 - 通过模拟 Ctrl+C 获取选中文本
+    /// </summary>
+    public void SelectionTranslate()
+    {
+        if (!Settings.EnableSelectionTranslate) return;
+
+        // 防抖：忽略 500ms 内的重复触发
+        var now = DateTime.Now;
+        if ((now - _lastSelectionTranslateTime).TotalMilliseconds < SelectionTranslateDebounceMs)
+        {
+            return;
+        }
+        _lastSelectionTranslateTime = now;
+
+        // 检查前台窗口是否是 TranslateTool 自己，跳过
+        if (IsTranslateToolInForeground())
+        {
+            return;
+        }
+
+        // 备份当前剪贴板内容
+        var previousClipboard = ClipboardHelper.GetClipboardText();
+        string? previousClipboardData = null;
+        if (!string.IsNullOrEmpty(previousClipboard))
+        {
+            previousClipboardData = previousClipboard;
+        }
+
+        try
+        {
+            // 模拟 Ctrl+C 复制选中文本
+            System.Windows.Forms.SendKeys.SendWait("^c");
+            // 等待剪贴板更新
+            System.Threading.Thread.Sleep(100);
+
+            // 读取剪贴板内容
+            var selectedText = ClipboardHelper.GetClipboardText();
+
+            // 恢复原剪贴板内容
+            if (previousClipboardData != null)
+            {
+                ClipboardHelper.SetClipboardText(previousClipboardData);
+            }
+
+            // 检查是否获取到有效文本
+            if (string.IsNullOrWhiteSpace(selectedText) || selectedText == previousClipboardData)
+            {
+                // 没有选中文本或选中文本与之前剪贴板相同
+                return;
+            }
+
+            // 过滤过短或过长的文本
+            if (selectedText.Length < 2 || selectedText.Length > 5000)
+            {
+                return;
+            }
+
+            _ = DoTranslate(selectedText);
+        }
+        catch
+        {
+            // 确保剪贴板被恢复
+            if (previousClipboardData != null)
+            {
+                try
+                {
+                    ClipboardHelper.SetClipboardText(previousClipboardData);
+                }
+                catch { }
+            }
+        }
+    }
+
+    /// <summary>
+    /// 检查前台窗口是否是翻译工具本身
+    /// </summary>
+    private static bool IsTranslateToolInForeground()
+    {
+        try
+        {
+            var foregroundWindow = NativeMethods.GetForegroundWindow();
+            if (foregroundWindow == IntPtr.Zero) return false;
+
+            // 获取前台窗口标题
+            var sb = new System.Text.StringBuilder(256);
+            NativeMethods.GetWindowText(foregroundWindow, sb, 256);
+            var windowTitle = sb.ToString();
+
+            // 检查是否是 TranslateTool 的窗口
+            if (windowTitle.Contains("TranslateTool") || windowTitle.Contains("翻译工具"))
+            {
+                return true;
+            }
+
+            // 获取前台窗口进程 ID
+            NativeMethods.GetWindowThreadProcessId(foregroundWindow, out uint foregroundPid);
+
+            // 获取当前进程 ID
+            var currentProcess = System.Diagnostics.Process.GetCurrentProcess();
+            return foregroundPid == currentProcess.Id;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
     private async Task ExecuteFileTranslate(string? _)
     {
         var dialog = new Microsoft.Win32.OpenFileDialog
@@ -360,6 +482,12 @@ public partial class FloatingWindowViewModel : ObservableObject
                 }
 
                 AddToHistory(text, cachedText!, Settings.TranslationEngine + " (缓存)");
+
+                // 保存 Toast 显示用的值
+                _translatedSourceText = sourcePreview;
+                _translatedResultText = cachedText!;
+                _translatedEngineName = Settings.TranslationEngine;
+
                 IsBusy = false;
                 return;
             }
@@ -394,6 +522,11 @@ public partial class FloatingWindowViewModel : ObservableObject
                 }
 
                 AddToHistory(text, result.TranslatedText, result.Engine);
+
+                // 保存 Toast 显示用的值
+                _translatedSourceText = sourcePreview;
+                _translatedResultText = result.TranslatedText;
+                _translatedEngineName = result.Engine;
             }
             else
             {
@@ -415,6 +548,18 @@ public partial class FloatingWindowViewModel : ObservableObject
         finally
         {
             IsBusy = false;
+
+            // 翻译完成后，若悬浮窗未显示且开启了 Toast 提示，则显示 Toast
+            if (!IsWindowVisible && Settings.ShowToastOnTranslate && !string.IsNullOrEmpty(_translatedResultText))
+            {
+                var sourceToShow = _translatedSourceText;
+                var resultToShow = _translatedResultText;
+                var engineToShow = _translatedEngineName;
+                System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                {
+                    TranslationToastWindow.Show(sourceToShow, resultToShow, engineToShow);
+                });
+            }
         }
     }
 
@@ -627,7 +772,38 @@ public partial class FloatingWindowViewModel : ObservableObject
 
             var results = await Task.WhenAll(tasks);
 
+            // 将源文本传递给评分服务（用于获取原文预览）
+            var sourceForScoring = SourceText.Length > 100 ? SourceText[..100] : SourceText;
+
+            // 计算所有翻译文本用于多样性评分
+            var allTranslations = results
+                .Where(r => r.IsSuccess)
+                .Select(r => r.TranslatedText)
+                .ToList();
+
+            // 为每个结果计算评分
             foreach (var result in results)
+            {
+                if (result.IsSuccess)
+                {
+                    var scoringResult = TranslationScoringService.ScoreResult(
+                        sourceForScoring,
+                        result.TranslatedText,
+                        allTranslations);
+                    result.Score = scoringResult.Score;
+                    result.ScoreReason = string.Join("；", scoringResult.Reasons);
+                }
+                else
+                {
+                    result.Score = 0;
+                    result.ScoreReason = "翻译失败";
+                }
+            }
+
+            // 按评分降序排列
+            var sortedResults = results.OrderByDescending(r => r.Score).ToList();
+
+            foreach (var result in sortedResults)
             {
                 ComparisonResults.Add(result);
             }
@@ -651,5 +827,10 @@ public class EngineComparisonResult
     public string EngineName { get; set; } = "";
     public string TranslatedText { get; set; } = "";
     public bool IsSuccess { get; set; }
+
+    // 评分相关属性
+    public double Score { get; set; }
+    public bool IsRecommended => Score >= 80;
+    public string ScoreReason { get; set; } = "";
 }
 

@@ -2,6 +2,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Interop;
+using System.Windows.Media.Animation;
 using TranslateTool.Models;
 using TranslateTool.ViewModels;
 
@@ -11,6 +12,16 @@ public partial class FloatingWindow : Window
 {
     private const int ResizeBorder = 6; // 边缘可拖拽区域像素
 
+    // 贴边隐藏相关
+    private enum DockState { Normal, DockedLeft, DockedRight, DockedTop, DockedBottom }
+    private DockState _currentDockState = DockState.Normal;
+    private double _normalWidth = 320;
+    private double _normalHeight = 400;
+    private bool _isDragging = false;
+    private bool _isMouseOver = false;
+    private bool _isAnimating = false;
+    private System.Windows.Point _dockSnapThreshold = new(10, 10); // 贴边阈值
+
     public FloatingWindow()
     {
         InitializeComponent();
@@ -19,11 +30,17 @@ public partial class FloatingWindow : Window
         DragEnter += FloatingWindow_DragEnter;
         Closing += FloatingWindow_Closing;
         Closed += FloatingWindow_Closed;
+        LocationChanged += FloatingWindow_LocationChanged;
+        MouseEnter += FloatingWindow_MouseEnter;
+        MouseLeave += FloatingWindow_MouseLeave;
         SourceInitialized += (_, _) =>
         {
             var source = HwndSource.FromHwnd(new WindowInteropHelper(this).Handle);
             source?.AddHook(WndProc);
         };
+        // 初始化正常尺寸
+        _normalWidth = Width;
+        _normalHeight = Height;
     }
 
     /// <summary>
@@ -119,13 +136,22 @@ public partial class FloatingWindow : Window
         var b = ResizeBorder;
         if (pos.X > b && pos.X < ActualWidth - b && pos.Y > b && pos.Y < ActualHeight - b)
         {
+            _isDragging = true;
             DragMove();
+            _isDragging = false;
+            // 拖动结束后检测是否需要贴边
+            CheckAndDock();
         }
     }
 
     private void Window_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
         // Allow DragMove to be triggered by the actual title bar area
+    }
+
+    private void Window_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+    {
+        _isDragging = false;
     }
 
     private void Window_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
@@ -339,4 +365,189 @@ public partial class FloatingWindow : Window
         }
         e.Handled = true;
     }
+
+    #region 贴边隐藏功能
+
+    /// <summary>
+    /// 位置改变时检测贴边
+    /// </summary>
+    private void FloatingWindow_LocationChanged(object? sender, EventArgs e)
+    {
+        // 仅在用户拖动时检测
+        if (_isDragging && !_isAnimating)
+        {
+            CheckAndDock();
+        }
+    }
+
+    /// <summary>
+    /// 鼠标进入窗口时展开
+    /// </summary>
+    private void FloatingWindow_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
+    {
+        _isMouseOver = true;
+        if (_currentDockState != DockState.Normal && !_isAnimating)
+        {
+            Undock();
+        }
+    }
+
+    /// <summary>
+    /// 鼠标离开窗口时收起
+    /// </summary>
+    private void FloatingWindow_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
+    {
+        _isMouseOver = false;
+    }
+
+    /// <summary>
+    /// 检测并执行贴边收起
+    /// </summary>
+    private void CheckAndDock()
+    {
+        if (!AppSettings.Current.EnableDockHide) return;
+        if (_currentDockState != DockState.Normal) return;
+        if (_isAnimating) return;
+        if (WindowState != WindowState.Normal) return;
+
+        var workArea = SystemParameters.WorkArea;
+        var threshold = _dockSnapThreshold.X;
+
+        // 记录当前尺寸
+        _normalWidth = ActualWidth;
+        _normalHeight = ActualHeight;
+
+        // 左侧贴边
+        if (Left < threshold)
+        {
+            DockToLeft();
+        }
+        // 右侧贴边
+        else if (Left + ActualWidth > workArea.Right - threshold)
+        {
+            DockToRight();
+        }
+        // 底部贴边
+        else if (Top + ActualHeight > workArea.Bottom - threshold)
+        {
+            DockToBottom();
+        }
+        // 顶部贴边（较少用）
+        else if (Top < threshold)
+        {
+            DockToTop();
+        }
+    }
+
+    /// <summary>
+    /// 贴边到左侧
+    /// </summary>
+    private void DockToLeft()
+    {
+        _currentDockState = DockState.DockedLeft;
+        SavePosition();
+        Left = 0;
+        AnimateToSize(8, _normalHeight);
+    }
+
+    /// <summary>
+    /// 贴边到右侧
+    /// </summary>
+    private void DockToRight()
+    {
+        _currentDockState = DockState.DockedRight;
+        SavePosition();
+        var workArea = SystemParameters.WorkArea;
+        Left = workArea.Right - 8;
+        AnimateToSize(8, _normalHeight);
+    }
+
+    /// <summary>
+    /// 贴边到顶部
+    /// </summary>
+    private void DockToTop()
+    {
+        _currentDockState = DockState.DockedTop;
+        SavePosition();
+        AnimateToSize(_normalWidth, 8);
+    }
+
+    /// <summary>
+    /// 贴边到底部
+    /// </summary>
+    private void DockToBottom()
+    {
+        _currentDockState = DockState.DockedBottom;
+        SavePosition();
+        var workArea = SystemParameters.WorkArea;
+        Top = workArea.Bottom - 8;
+        AnimateToSize(_normalWidth, 8);
+    }
+
+    /// <summary>
+    /// 从贴边状态展开
+    /// </summary>
+    private void Undock()
+    {
+        if (_currentDockState == DockState.Normal) return;
+
+        var workArea = SystemParameters.WorkArea;
+
+        switch (_currentDockState)
+        {
+            case DockState.DockedLeft:
+                Left = 0;
+                AnimateToSize(_normalWidth, _normalHeight);
+                break;
+            case DockState.DockedRight:
+                Left = workArea.Right - _normalWidth;
+                AnimateToSize(_normalWidth, _normalHeight);
+                break;
+            case DockState.DockedTop:
+                Top = 0;
+                AnimateToSize(_normalWidth, _normalHeight);
+                break;
+            case DockState.DockedBottom:
+                Top = workArea.Bottom - _normalHeight;
+                AnimateToSize(_normalWidth, _normalHeight);
+                break;
+        }
+
+        _currentDockState = DockState.Normal;
+    }
+
+    /// <summary>
+    /// 动画改变窗口尺寸
+    /// </summary>
+    private void AnimateToSize(double targetWidth, double targetHeight)
+    {
+        _isAnimating = true;
+        var duration = TimeSpan.FromMilliseconds(200);
+
+        var widthAnimation = new DoubleAnimation(targetWidth, duration)
+        {
+            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+        };
+        var heightAnimation = new DoubleAnimation(targetHeight, duration)
+        {
+            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+        };
+
+        widthAnimation.Completed += (_, _) => _isAnimating = false;
+
+        BeginAnimation(WidthProperty, widthAnimation);
+        BeginAnimation(HeightProperty, heightAnimation);
+    }
+
+    /// <summary>
+    /// 保存位置到设置
+    /// </summary>
+    private void SavePosition()
+    {
+        AppSettings.Current.FloatingWindowTop = Top;
+        AppSettings.Current.FloatingWindowLeft = Left;
+        AppSettings.Current.Save();
+    }
+
+    #endregion
 }

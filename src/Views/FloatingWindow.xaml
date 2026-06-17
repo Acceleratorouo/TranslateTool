@@ -14,6 +14,7 @@
         Topmost="False"
         ResizeMode="CanResize"
         MouseLeftButtonDown="Window_MouseLeftButtonDown"
+        MouseLeftButtonUp="Window_MouseLeftButtonUp"
         MouseRightButtonDown="Window_MouseRightButtonDown"
         PreviewMouseLeftButtonDown="Window_PreviewMouseLeftButtonDown"
         KeyDown="Window_KeyDown"
@@ -277,22 +278,61 @@
                                                         CornerRadius="6"
                                                         BorderBrush="{DynamicResource ClaudeBorder}"
                                                         BorderThickness="1">
-                                                    <StackPanel>
-                                                        <TextBlock Text="{Binding EngineName}"
-                                                                   Foreground="{DynamicResource ClaudePrimary}"
-                                                                   FontSize="11"
-                                                                   FontWeight="SemiBold"
-                                                                   Margin="0,0,0,4"
-                                                                   AutomationProperties.Name="引擎名称"/>
-                                                        <TextBlock Text="{Binding TranslatedText}"
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                            <ColumnDefinition Width="*"/>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                        </Grid.ColumnDefinitions>
+
+                                                        <!-- 引擎名 + 推荐标签 -->
+                                                        <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Top">
+                                                            <TextBlock Text="{Binding EngineName}"
+                                                                       Foreground="{DynamicResource ClaudePrimary}"
+                                                                       FontSize="11"
+                                                                       FontWeight="SemiBold"
+                                                                       AutomationProperties.Name="引擎名称"/>
+                                                            <!-- 推荐标签 -->
+                                                            <Border Background="Gold"
+                                                                    CornerRadius="4"
+                                                                    Padding="4,2"
+                                                                    Margin="6,0,0,0"
+                                                                    Visibility="{Binding IsRecommended, Converter={StaticResource BoolToVisibility}}">
+                                                                <TextBlock Text="推荐"
+                                                                           FontSize="10"
+                                                                           Foreground="Black"
+                                                                           FontWeight="Bold"
+                                                                           AutomationProperties.Name="推荐"/>
+                                                            </Border>
+                                                        </StackPanel>
+
+                                                        <!-- 译文 -->
+                                                        <TextBlock Grid.Column="1"
+                                                                   Text="{Binding TranslatedText}"
                                                                    TextWrapping="Wrap"
                                                                    Foreground="{DynamicResource ClaudeText}"
                                                                    FontSize="12"
+                                                                   Margin="8,0"
                                                                    FlowDirection="{Binding TranslatedText, Converter={StaticResource TextToFlowDirection}}"
                                                                    TextAlignment="{Binding TranslatedText, Converter={StaticResource TextToAlignment}}"
                                                                    AutomationProperties.Name="引擎译文"
                                                                    AutomationProperties.LiveSetting="Polite"/>
-                                                    </StackPanel>
+
+                                                        <!-- 评分显示 -->
+                                                        <StackPanel Grid.Column="2"
+                                                                    Orientation="Horizontal"
+                                                                    VerticalAlignment="Top"
+                                                                    Margin="4,0,0,0">
+                                                            <TextBlock Text="{Binding Score, StringFormat={}{0:F0}}"
+                                                                       FontSize="11"
+                                                                       Foreground="{DynamicResource ClaudeTextMuted}"
+                                                                       FontWeight="Medium"/>
+                                                            <TextBlock Text="分"
+                                                                       FontSize="11"
+                                                                       Foreground="{DynamicResource ClaudeTextMuted}"
+                                                                       Margin="2,0,0,0"/>
+                                                        </StackPanel>
+                                                    </Grid>
                                                 </Border>
                                             </DataTemplate>
                                         </ItemsControl.ItemTemplate>

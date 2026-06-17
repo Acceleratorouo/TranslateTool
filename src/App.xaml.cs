@@ -25,9 +25,6 @@ public partial class App : System.Windows.Application
     /// </summary>
     public static bool IsForceExit => _forceExit;
 
-    private const int HotKeyId = 0xF001;
-    private const int ToggleWindowVirtualKey = 0x54;
-
     protected override void OnStartup(StartupEventArgs e)
     {
         // 初始化用户数据目录（首次访问时自动创建）
@@ -87,9 +84,16 @@ public partial class App : System.Windows.Application
 
         NativeMethods.RegisterHotKey(
             _floatingWindowHandle,
-            HotKeyId,
+            NativeMethods.HOTKEY_TOGGLE_WINDOW,
             NativeMethods.ModControl | NativeMethods.ModShift,
-            ToggleWindowVirtualKey);
+            NativeMethods.VK_T);
+
+        // 注册划词翻译热键 Ctrl+Shift+X
+        NativeMethods.RegisterHotKey(
+            _floatingWindowHandle,
+            NativeMethods.HOTKEY_SELECTION_TRANSLATE,
+            NativeMethods.ModControl | NativeMethods.ModShift,
+            NativeMethods.VK_X);
 
         // 创建托盘图标
         var iconPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "TranslateTool.ico");
@@ -256,7 +260,7 @@ public partial class App : System.Windows.Application
         });
 
         // 快捷键提示
-        contextMenu.Items.Add(new ToolStripMenuItem("快捷键: Ctrl+Shift+T") { Enabled = false });
+        contextMenu.Items.Add(new ToolStripMenuItem("快捷键: Ctrl+Shift+T 显示 | Ctrl+Shift+X 划词翻译") { Enabled = false });
 
         contextMenu.Items.Add(new ToolStripSeparator());
 
@@ -286,10 +290,22 @@ public partial class App : System.Windows.Application
     {
         const int WM_HOTKEY = 0x0312;
 
-        if (msg == WM_HOTKEY && wParam.ToInt32() == HotKeyId)
+        if (msg == WM_HOTKEY)
         {
-            ShowFloatingWindow();
-            handled = true;
+            var hotkeyId = wParam.ToInt32();
+
+            if (hotkeyId == NativeMethods.HOTKEY_TOGGLE_WINDOW)
+            {
+                ShowFloatingWindow();
+                handled = true;
+            }
+            else if (hotkeyId == NativeMethods.HOTKEY_SELECTION_TRANSLATE)
+            {
+                // 划词翻译热键
+                var vm = Services.GetRequiredService<FloatingWindowViewModel>();
+                vm.SelectionTranslate();
+                handled = true;
+            }
         }
 
         return IntPtr.Zero;
@@ -299,7 +315,8 @@ public partial class App : System.Windows.Application
     {
         if (_floatingWindowHandle != IntPtr.Zero)
         {
-            NativeMethods.UnregisterHotKey(_floatingWindowHandle, HotKeyId);
+            NativeMethods.UnregisterHotKey(_floatingWindowHandle, NativeMethods.HOTKEY_TOGGLE_WINDOW);
+            NativeMethods.UnregisterHotKey(_floatingWindowHandle, NativeMethods.HOTKEY_SELECTION_TRANSLATE);
         }
 
         // 保存翻译缓存
