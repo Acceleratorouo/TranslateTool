@@ -58,6 +58,10 @@ public class AppSettings
     public int ScoreWeightSmoothness { get; set; } = 15;
     public int ScoreWeightRejection { get; set; } = 10;
 
+    // AI 翻译供应商配置
+    public List<LlmProvider> LlmProviders { get; set; } = new();
+    public AiTranslationSettings AiTranslationSettings { get; set; } = new();
+
     /// <summary>
     /// 从 JSON 文件加载设置
     /// </summary>
