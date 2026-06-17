@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
+  <metadata>
+    <id>TranslateTool</id>
+    <version>1.0.0</version>
+    <title>TranslateTool (翻译工具)</title>
+    <authors>TranslateTool</authors>
+    <projectUrl>https://github.com/TranslateTool/TranslateTool</projectUrl>
+    <iconUrl>https://raw.githubusercontent.com/TranslateTool/TranslateTool/main/src/Resources/TranslateTool.png</iconUrl>
+    <copyright>Copyright © 2026 TranslateTool</copyright>
+    <licenseUrl>https://github.com/TranslateTool/TranslateTool/blob/main/LICENSE</licenseUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <projectSourceUrl>https://github.com/TranslateTool/TranslateTool</projectSourceUrl>
+    <docsUrl>https://github.com/TranslateTool/TranslateTool/blob/main/docs/PACKAGING.md</docsUrl>
+    <bugTrackerUrl>https://github.com/TranslateTool/TranslateTool/issues</bugTrackerUrl>
+    <tags>translation translator ocr clipboard multilingual wpf dotnet admin</tags>
+    <summary>Desktop translation tool with Baidu/Google/Microsoft/DeepL engines</summary>
+    <description><![CDATA[
+# 翻译工具 / TranslateTool
+
+WPF 桌面翻译应用，集成四大翻译引擎：**百度、Google、微软、DeepL**。
+
+## 核心功能
+
+- **剪贴板自动翻译**：复制文本 500ms 后自动翻译
+- **框选 OCR 翻译**：屏幕任意区域取词翻译（Tesseract）
+- **文件翻译**：拖拽 `.txt` / `.docx` / `.pdf` 即可翻译
+- **多引擎对比**：同时调用 4 个引擎横向对比
+- **翻译缓存**：相同文本 7 天内不重复请求
+- **翻译历史**：最多 100 条，支持搜索
+
+## 隐私
+
+- 所有数据本地存储（`%APPDATA%\TranslateTool\`）
+- 不向任何自建服务器上传数据
+- 一键导出 / 删除所有数据（GDPR 合规）
+- 无遥测、无分析
+
+## 系统要求
+
+- Windows 10 1809+ / Windows 11
+- .NET 8 Desktop Runtime（如使用框架依赖版本）
+
+## 更多信息
+
+- 文档：https://github.com/TranslateTool/TranslateTool
+- 问题反馈：https://github.com/TranslateTool/TranslateTool/issues
+    ]]></description>
+    <releaseNotes><![CDATA[
+# 1.0.0 (2026-06-17)
+
+## 首次发布
+
+- 4 个翻译引擎：百度、Google、微软、DeepL
+- 剪贴板自动翻译、框选 OCR、文件翻译
+- 多引擎对比、翻译缓存、翻译历史
+- 深色 / 浅色主题、RTL 语言支持
+- 无障碍（屏幕阅读器 + 键盘导航）
+- GDPR 合规：本地存储 + 一键导出/删除
+    ]]></releaseNotes>
+  </metadata>
+  <files>
+    <file src="tools\**" target="tools" />
+    <file src="LICENSE.txt" target="tools" />
+  </files>
+</package>

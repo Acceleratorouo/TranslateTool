@@ -1,6 +1,7 @@
 using System.IO;
 using System.Windows;
 using TranslateTool.Models;
+using TranslateTool.Utils;
 
 namespace TranslateTool.Views;
 
@@ -14,7 +15,7 @@ public partial class FirstRunWizard : Window
 
     private void CheckOcrStatus()
     {
-        var tessdataPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "tessdata");
+        var tessdataPath = UserDataPaths.TessDataDirectory;
         var chiSimPath = Path.Combine(tessdataPath, "chi_sim.traineddata");
         var engPath = Path.Combine(tessdataPath, "eng.traineddata");
 

@@ -1,6 +1,7 @@
 using System.Collections.Concurrent;
 using System.IO;
 using System.Text.Json;
+using TranslateTool.Utils;
 
 namespace TranslateTool.Services;
 
@@ -9,8 +10,7 @@ namespace TranslateTool.Services;
 /// </summary>
 public static class TranslationCache
 {
-    private static readonly string CacheFilePath = Path.Combine(
-        AppDomain.CurrentDomain.BaseDirectory, "translation_cache.json");
+    private static readonly string CacheFilePath = UserDataPaths.CacheFile;
 
     private static readonly ConcurrentDictionary<string, CacheEntry> _cache = new();
     private static readonly TimeSpan CacheExpiry = TimeSpan.FromDays(7); // 缓存 7 天
@@ -36,6 +36,7 @@ public static class TranslationCache
 
         try
         {
+            UserDataPaths.EnsureDirectoryExists(UserDataPaths.CacheDirectory);
             if (File.Exists(CacheFilePath))
             {
                 var json = File.ReadAllText(CacheFilePath);
@@ -64,6 +65,7 @@ public static class TranslationCache
     {
         try
         {
+            UserDataPaths.EnsureDirectoryExists(UserDataPaths.CacheDirectory);
             // 清除过期条目
             var expiredKeys = _cache.Where(x => x.Value.IsExpired).Select(x => x.Key).ToList();
             foreach (var key in expiredKeys)

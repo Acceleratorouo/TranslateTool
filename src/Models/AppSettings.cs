@@ -1,6 +1,7 @@
-﻿using System.IO;
+using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using TranslateTool.Utils;
 
 namespace TranslateTool.Models;
 
@@ -8,8 +9,7 @@ public class AppSettings
 {
     public static AppSettings Current { get; private set; } = new();
 
-    private static readonly string SettingsFilePath = Path.Combine(
-        AppDomain.CurrentDomain.BaseDirectory, "app_settings.json");
+    private static readonly string SettingsFilePath = UserDataPaths.SettingsFile;
 
     public string SourceLanguage { get; set; } = "auto";
     public string TargetLanguage { get; set; } = "zh-CN";
@@ -49,6 +49,7 @@ public class AppSettings
     {
         try
         {
+            UserDataPaths.EnsureDirectoryExists(UserDataPaths.RoamingAppDataDirectory);
             if (File.Exists(SettingsFilePath))
             {
                 var json = File.ReadAllText(SettingsFilePath);
@@ -78,6 +79,7 @@ public class AppSettings
     {
         try
         {
+            UserDataPaths.EnsureDirectoryExists(UserDataPaths.RoamingAppDataDirectory);
             var json = JsonSerializer.Serialize(this, new JsonSerializerOptions
             {
                 WriteIndented = true
@@ -88,5 +90,13 @@ public class AppSettings
         {
             // 保存失败静默忽略
         }
+    }
+
+    /// <summary>
+    /// 重置为默认设置（仅影响内存中的 <see cref="Current"/>，不删除磁盘文件）
+    /// </summary>
+    public static void Reset()
+    {
+        Current = new AppSettings();
     }
 }

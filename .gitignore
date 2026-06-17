@@ -46,6 +46,12 @@ MEMORY.md
 CODE_WIKI.md
 trae-agent-code-wiki.md
 docs/superpowers/
+# Allow in-repo engineering docs to be tracked
+!docs/CODE_REVIEW_CHECKLIST.md
+!docs/CODEOWNERS
+!docs/SECURITY.md
+!docs/PRIVACY.md
+!docs/PACKAGING.md
 
 ## Assets (local only)
 creative-brand-art.svg

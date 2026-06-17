@@ -1,0 +1,44 @@
+PackageIdentifier: TranslateTool.TranslateTool
+PackageVersion: 1.0.0
+PackageLocale: en-US
+Publisher: TranslateTool
+PackageName: TranslateTool
+License: MIT
+ShortDescription: Desktop translation tool supporting Baidu/Google/Microsoft/DeepL
+Description: |-
+  TranslateTool is a WPF desktop translation application for Windows that
+  integrates four major translation engines: Baidu, Google, Microsoft, and DeepL.
+
+  Features:
+  - Clipboard auto-translate (copy text, get instant translation)
+  - Region OCR (draw a box on screen, translate text inside)
+  - File translation (.txt, .docx, .pdf)
+  - Multi-engine comparison (run all four engines side by side)
+  - Translation history and cache
+  - Dark / light theme switching
+  - RTL language support (Arabic, Hebrew, Persian, Urdu)
+  - Full keyboard navigation and screen reader support
+  - GDPR-compliant: all data stays local, one-click export/delete
+  - Customizable global hotkey
+  - System tray integration
+
+  No telemetry. No analytics. No background uploads. Just a fast, offline-first
+  translation tool.
+Moniker: translatetool
+Tags:
+- translation
+- translator
+- ocr
+- clipboard
+- multilingual
+- wpf
+- dotnet
+ManifestType: defaultLocale
+ManifestVersion: 1.6.0
+ReleaseNotes: |
+  - Initial release
+  - 4 translation engines
+  - Clipboard auto-translate, region OCR, file translation
+  - Multi-engine comparison
+  - Dark/light theme, RTL support, accessibility
+  - GDPR-compliant local data storage

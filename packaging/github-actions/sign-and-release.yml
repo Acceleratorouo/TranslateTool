@@ -1,0 +1,87 @@
+name: Sign and Release
+
+# 仅在 tag 推送时触发
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-sign:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Restore
+        run: dotnet restore "src/TranslateTool.csproj"
+
+      - name: Publish (self-contained, win-x64)
+        run: |
+          dotnet publish "src/TranslateTool.csproj" `
+            --configuration Release `
+            --runtime win-x64 `
+            --self-contained true `
+            -p:PublishSingleFile=false `
+            -p:Version=${{ github.ref_name }} `
+            -o "publish/win-x64"
+
+      # —— 签名 ——
+      - name: Decode certificate
+        env:
+          PFX_B64: ${{ secrets.CODE_SIGN_PFX_BASE64 }}
+        shell: pwsh
+        run: |
+          if (-not $env:PFX_B64) {
+            Write-Error "缺少 secrets.CODE_SIGN_PFX_BASE64，跳过签名"
+            exit 1
+          }
+          [System.IO.File]::WriteAllBytes(
+            "TranslateTool.pfx",
+            [Convert]::FromBase64String($env:PFX_B64)
+          )
+
+      - name: Sign executables
+        env:
+          PFX_PASSWORD: ${{ secrets.CODE_SIGN_PFX_PASSWORD }}
+        shell: pwsh
+        run: |
+          $securePwd = ConvertTo-SecureString $env:PFX_PASSWORD -AsPlainText -Force
+          ./scripts/sign.ps1 `
+            -FilePath "publish/win-x64" `
+            -CertificatePath "TranslateTool.pfx" `
+            -CertificatePassword $securePwd `
+            -TimestampUrl "http://timestamp.digicert.com" `
+            -Recursive
+
+      - name: Build Inno Setup installer
+        uses: Minionguyjpro/Inno-Setup-Action@1.2.3
+        with:
+          path: installer.iss
+
+      - name: Compute SHA256
+        shell: pwsh
+        run: |
+          $hash = (Get-FileHash -Algorithm SHA256 "installer/TranslateTool_Setup_${{ github.ref_name }}.exe").Hash.ToLower()
+          $hash | Out-File -Encoding utf8 setup.sha256
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: ${{ github.ref_name }}
+          generate_release_notes: true
+          files: |
+            installer/TranslateTool_Setup_${{ github.ref_name }}.exe
+            setup.sha256
+            publish/win-x64/TranslateTool.exe
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

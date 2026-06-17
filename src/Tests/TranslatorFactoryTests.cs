@@ -1,4 +1,4 @@
-﻿using Xunit;
+using Xunit;
 using TranslateTool.Services;
 
 namespace TranslateTool.Tests;
@@ -28,6 +28,14 @@ public class TranslatorFactoryTests
         var translator = TranslatorFactory.Create("microsoft");
         Assert.NotNull(translator);
         Assert.IsType<MicrosoftTranslator>(translator);
+    }
+
+    [Fact]
+    public void Create_WithDeepL_ReturnsDeepLTranslator()
+    {
+        var translator = TranslatorFactory.Create("deepl");
+        Assert.NotNull(translator);
+        Assert.IsType<DeepLTranslator>(translator);
     }
 
     [Theory]
@@ -63,7 +71,7 @@ public class TranslatorFactoryTests
     [Fact]
     public void Create_WithUnsupportedEngine_ThrowsNotSupportedException()
     {
-        var ex = Assert.Throws<NotSupportedException>(() => TranslatorFactory.Create("deepl"));
+        var ex = Assert.Throws<NotSupportedException>(() => TranslatorFactory.Create("unknown"));
         Assert.Contains("暂不支持", ex.Message);
     }
 
@@ -77,13 +85,14 @@ public class TranslatorFactoryTests
     }
 
     [Fact]
-    public void GetAvailableEngines_ReturnsThreeEngines()
+    public void GetAvailableEngines_ReturnsFourEngines()
     {
         var engines = TranslatorFactory.GetAvailableEngines();
-        Assert.Equal(3, engines.Length);
+        Assert.Equal(4, engines.Length);
         Assert.Contains("baidu", engines);
         Assert.Contains("google", engines);
         Assert.Contains("microsoft", engines);
+        Assert.Contains("deepl", engines);
     }
 
     [Fact]

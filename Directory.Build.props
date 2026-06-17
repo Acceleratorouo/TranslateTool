@@ -1,0 +1,40 @@
+<!--
+  Centralized build properties for TranslateTool.
+  This file is auto-imported by all .csproj files in subdirectories. It enforces
+  common settings like nullable, implicit usings, deterministic builds.
+  See https://docs.microsoft.com/visualstudio/msbuild/customize-by-directory
+-->
+
+<Project>
+
+  <PropertyGroup>
+    <!-- Strict C# settings -->
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <WarningsAsErrors>nullable</WarningsAsErrors>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+
+    <!-- Deterministic builds (for reproducible CI) -->
+    <Deterministic>true</Deterministic>
+    <ContinuousIntegrationBuild Condition="'$(CI)' == 'true'">true</ContinuousIntegrationBuild>
+
+    <!-- Code analysis (.NET 8 SDK 内置 Roslyn 分析器) -->
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <AnalysisLevel>latest</AnalysisLevel>
+    <AnalysisMode>AllEnabledByDefault</AnalysisMode>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Versioning">
+    <Version>1.0.0</Version>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+    <InformationalVersion>1.0.0</InformationalVersion>
+    <Company>TranslateTool</Company>
+    <Product>TranslateTool</Product>
+    <Copyright>Copyright © 2026 TranslateTool</Copyright>
+  </PropertyGroup>
+
+</Project>

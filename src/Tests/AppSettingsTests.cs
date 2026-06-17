@@ -1,8 +1,9 @@
-﻿using Xunit;
+using Xunit;
 using TranslateTool.Models;
 
 namespace TranslateTool.Tests;
 
+[Collection("UserData")]
 public class AppSettingsTests
 {
     [Fact]

@@ -38,12 +38,15 @@
                 Canvas.Left="0"
                 Canvas.Top="0"
                 Width="1920"
-                Height="40">
+                Height="40"
+                AutomationProperties.Name="框选翻译提示"
+                AutomationProperties.HelpText="拖动鼠标选择要翻译的屏幕区域，按 ESC 取消">
             <TextBlock Text="🖱️ 拖动鼠标选择翻译区域 | ESC 取消"
                        Foreground="White"
                        FontSize="14"
                        HorizontalAlignment="Center"
-                       VerticalAlignment="Center"/>
+                       VerticalAlignment="Center"
+                       AutomationProperties.Name="拖动鼠标选择翻译区域，按 ESC 取消"/>
         </Border>
     </Canvas>
 </Window>

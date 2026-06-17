@@ -1,4 +1,4 @@
-﻿using System.Windows;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Interop;
@@ -236,6 +236,60 @@ public partial class FloatingWindow : Window
     private void CloseButton_Click(object sender, RoutedEventArgs e)
     {
         Hide();
+    }
+
+    private void Window_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+    {
+        if (e.Key == Key.Escape)
+        {
+            Hide();
+            e.Handled = true;
+        }
+        else if (e.KeyboardDevice.Modifiers == ModifierKeys.Control && e.Key == Key.C)
+        {
+            if (DataContext is FloatingWindowViewModel vm && !string.IsNullOrEmpty(vm.TranslatedText))
+            {
+                System.Windows.Clipboard.SetText(vm.TranslatedText);
+                vm.ResultText = "✅ 译文已复制到剪贴板";
+                e.Handled = true;
+            }
+        }
+    }
+
+    private void SourceLangBorder_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+    {
+        if (e.Key == Key.Enter || e.Key == Key.Space)
+        {
+            SourceLangBorder_MouseLeftButtonDown(sender, null!);
+            e.Handled = true;
+        }
+    }
+
+    private void TargetLangBorder_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+    {
+        if (e.Key == Key.Enter || e.Key == Key.Space)
+        {
+            TargetLangBorder_MouseLeftButtonDown(sender, null!);
+            e.Handled = true;
+        }
+    }
+
+    private void SourceTextBorder_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+    {
+        if (e.Key == Key.Enter || e.Key == Key.Space)
+        {
+            SourceText_MouseLeftButtonDown(sender, null!);
+            e.Handled = true;
+        }
+    }
+
+    private void TranslatedTextBorder_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+    {
+        if (e.Key == Key.Enter || e.Key == Key.Space)
+        {
+            TranslatedText_MouseLeftButtonDown(sender, null!);
+            e.Handled = true;
+        }
     }
 
     private void SourceLangBorder_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)

@@ -1,0 +1,54 @@
+PackageIdentifier: TranslateTool.TranslateTool
+PackageVersion: 1.0.0
+PackageLocale: en-US
+Publisher: TranslateTool
+PackageName: TranslateTool
+License: MIT
+ShortDescription: Desktop translation tool supporting Baidu/Google/Microsoft/DeepL
+Moniker: translatetool
+Tags:
+- translation
+- translator
+- ocr
+- clipboard
+- multilingual
+- wpf
+- dotnet
+ManifestType: installer
+ManifestVersion: 1.6.0
+Installers:
+- Architecture: x64
+  InstallerType: inno
+  InstallerUrl: https://github.com/TranslateTool/TranslateTool/releases/download/v1.0.0/TranslateTool_Setup_1.0.0.exe
+  InstallerSha256: 0000000000000000000000000000000000000000000000000000000000000000
+  SignatureSha256: 0000000000000000000000000000000000000000000000000000000000000000
+  UpgradeBehavior: install
+FileExtensions:
+- txt
+- docx
+- pdf
+Commands:
+- TranslateTool.exe
+AppsAndFeaturesEntries:
+- DisplayName: TranslateTool
+  DisplayVersion: 1.0.0
+  Publisher: TranslateTool
+  ProductCode: '{{E8A3B5C7-D4F6-4A9B-8C2D-1E3F5A7B9C0D}'
+ReleaseDate: 2026-06-17
+InstallerAbortsTerminal: false
+ElevationRequirement: medium
+ExpectedReturnCode: 0
+InstallModes:
+- silent
+- silentWithProgress
+Uninstallers:
+- Architecture: x64
+  Type: inno
+  SilentUninstallString: '"$InnoSetupExePath$" /SILENT /CURRENTUSER /SP-'
+ReleaseNotes: |
+  - Initial release
+  - 4 translation engines (Baidu, Google, Microsoft, DeepL)
+  - Clipboard auto-translate, region OCR, file translation
+  - Multi-engine comparison
+  - Dark/light theme, RTL support, accessibility
+  - GDPR-compliant local data storage

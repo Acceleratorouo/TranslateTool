@@ -1,8 +1,9 @@
-﻿using System.Drawing;
+using System.Drawing;
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Tesseract;
+using TranslateTool.Utils;
 
 namespace TranslateTool.Services;
 
@@ -11,8 +12,7 @@ namespace TranslateTool.Services;
 /// </summary>
 public static class OcrService
 {
-    private static readonly string TessDataPath = Path.Combine(
-        AppDomain.CurrentDomain.BaseDirectory, "tessdata");
+    private static readonly string TessDataPath = UserDataPaths.TessDataDirectory;
 
     private static bool _initialized;
     private static bool _downloading;

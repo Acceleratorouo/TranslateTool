@@ -1,0 +1,111 @@
+# EditorConfig 规则 — TranslateTool
+# 配合 SonarQube / StyleCop / Roslyn 分析器
+# 详细文档: https://docs.microsoft.com/visualstudio/ide/create-portable-custom-editor-options
+
+root = true
+
+[*]
+indent_style = space
+indent_size = 4
+end_of_line = lf
+charset = utf-8
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+[*.{json,yml,yaml}]
+indent_size = 2
+
+[*.{cs,xaml}]
+indent_size = 4
+
+# C# 代码风格
+[*.cs]
+# 命名风格
+dotnet_naming_rule.private_fields_should_be_camel_case.severity = warning
+dotnet_naming_rule.private_fields_should_be_camel_case.symbols = private_fields
+dotnet_naming_rule.private_fields_should_be_camel_case.style = underscore_camel_case
+
+dotnet_naming_symbols.private_fields.applicable_kinds = field
+dotnet_naming_symbols.private_fields.applicable_accessibilities = private
+
+dotnet_naming_style.underscore_camel_case.required_prefix = _
+dotnet_naming_style.underscore_camel_case.capitalization = camel_case
+
+# 优先 var（10 行内）
+csharp_style_var_for_built_in_types = false:suggestion
+csharp_style_var_when_type_is_apparent = true:suggestion
+csharp_style_var_elsewhere = false:suggestion
+
+# using 排序
+dotnet_sort_system_directives_first = true
+dotnet_separate_import_directive_groups = false
+
+# 括号
+csharp_prefer_braces = when_multiline:suggestion
+csharp_prefer_simple_using_statement = true:suggestion
+
+# this.
+dotnet_style_qualification_for_field = false:suggestion
+dotnet_style_qualification_for_property = false:suggestion
+dotnet_style_qualification_for_method = false:suggestion
+dotnet_style_qualification_for_event = false:suggestion
+
+# 可空性
+dotnet_style_null_checking = true:warning
+
+# 新表达式
+csharp_style_pattern_matching_over_is_with_cast_check = true:suggestion
+csharp_style_pattern_matching_over_as_with_null_check = true:suggestion
+
+# 简化
+csharp_style_prefer_switch_expression = true:suggestion
+csharp_style_prefer_pattern_matching = true:suggestion
+csharp_style_prefer_not_pattern = true:suggestion
+
+# Expression-bodied members
+csharp_style_expression_bodied_methods = when_on_single_line:suggestion
+csharp_style_expression_bodied_constructors = false:suggestion
+csharp_style_expression_bodied_operators = when_on_single_line:suggestion
+csharp_style_expression_bodied_properties = true:suggestion
+csharp_style_expression_bodied_indexers = true:suggestion
+csharp_style_expression_bodied_accessors = true:suggestion
+csharp_style_expression_bodied_lambdas = true:suggestion
+csharp_style_expression_bodied_local_functions = when_on_single_line:suggestion
+
+# 文件头
+dotnet_diagnostic.CA1014.severity = none
+dotnet_diagnostic.CA1812.severity = none  # uninstantiated internal classes
+dotnet_diagnostic.CA1822.severity = none  # mark members static
+dotnet_diagnostic.CA2007.severity = warning  # ConfigureAwait
+
+# StyleCop 默认行为
+dotnet_diagnostic.SA1633.severity = none  # file header
+dotnet_diagnostic.SA1634.severity = none  # file header summary
+dotnet_diagnostic.SA1635.severity = none  # file header has company
+dotnet_diagnostic.SA1636.severity = none  # file header copyright
+dotnet_diagnostic.SA1637.severity = none  # file header company
+dotnet_diagnostic.SA1638.severity = none  # file header file name
+dotnet_diagnostic.SA1640.severity = none  # file header must have valid text
+dotnet_diagnostic.SA1651.severity = none  # do not use placeholder
+dotnet_diagnostic.SA1652.severity = none  # enable XML doc output
+
+# 抑制：测试项目中的 StyleCop 规则
+[*.Tests.cs]
+dotnet_diagnostic.SA1600.severity = none
+dotnet_diagnostic.SA1601.severity = none
+dotnet_diagnostic.SA1602.severity = none
+dotnet_diagnostic.SA1611.severity = none
+dotnet_diagnostic.SA1615.severity = none
+dotnet_diagnostic.SA1618.severity = none
+dotnet_diagnostic.SA1623.severity = none
+dotnet_diagnostic.SA1629.severity = none
+dotnet_diagnostic.SA1633.severity = none
+dotnet_diagnostic.SA1634.severity = none
+dotnet_diagnostic.SA1635.severity = none
+dotnet_diagnostic.SA1636.severity = none
+dotnet_diagnostic.SA1637.severity = none
+dotnet_diagnostic.SA1638.severity = none
+dotnet_diagnostic.SA1640.severity = none
+dotnet_diagnostic.SA1651.severity = none
+dotnet_diagnostic.SA1652.severity = none
+dotnet_diagnostic.SA0001.severity = none

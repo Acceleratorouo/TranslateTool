@@ -1,4 +1,4 @@
-﻿using System.Windows;
+using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Interop;
 using Microsoft.Extensions.DependencyInjection;
@@ -30,6 +30,9 @@ public partial class App : System.Windows.Application
 
     protected override void OnStartup(StartupEventArgs e)
     {
+        // 初始化用户数据目录（首次访问时自动创建）
+        UserDataPaths.Initialize();
+
         // 加载持久化设置
         AppSettings.Load();
 

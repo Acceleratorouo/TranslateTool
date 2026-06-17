@@ -1,4 +1,4 @@
-﻿using Xunit;
+using Xunit;
 using TranslateTool.Services;
 
 namespace TranslateTool.Tests;
@@ -6,14 +6,14 @@ namespace TranslateTool.Tests;
 public class EngineStatusTests
 {
     [Fact]
-    public void GetAll_ReturnsThreeEngines()
+    public void GetAll_ReturnsFourEngines()
     {
         var statuses = EngineStatus.GetAll();
-        Assert.Equal(3, statuses.Length);
+        Assert.Equal(4, statuses.Length);
     }
 
     [Fact]
-    public void GetAll_ContainsBaiduGoogleMicrosoft()
+    public void GetAll_ContainsBaiduGoogleMicrosoftDeepL()
     {
         var statuses = EngineStatus.GetAll();
         var names = statuses.Select(s => s.Name).ToArray();
@@ -21,6 +21,7 @@ public class EngineStatusTests
         Assert.Contains("baidu", names);
         Assert.Contains("google", names);
         Assert.Contains("microsoft", names);
+        Assert.Contains("deepl", names);
     }
 
     [Fact]

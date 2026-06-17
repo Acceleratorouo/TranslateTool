@@ -1,4 +1,4 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Text.Json;
 using System.Windows.Input;
@@ -9,6 +9,7 @@ using CommunityToolkit.Mvvm.Input;
 using TranslateTool.Localization;
 using TranslateTool.Models;
 using TranslateTool.Services;
+using TranslateTool.Utils;
 
 namespace TranslateTool.ViewModels;
 
@@ -30,8 +31,7 @@ public class HistoryEntry
 public partial class FloatingWindowViewModel : ObservableObject
 {
     private const string IdleMessage = "复制文本自动翻译";
-    private static readonly string HistoryFilePath = Path.Combine(
-        AppDomain.CurrentDomain.BaseDirectory, "translation_history.json");
+    private static readonly string HistoryFilePath = UserDataPaths.HistoryFile;
 
     // 剪贴板监听
     private DispatcherTimer? _clipboardTimer;
@@ -442,6 +442,7 @@ public partial class FloatingWindowViewModel : ObservableObject
     {
         try
         {
+            UserDataPaths.EnsureDirectoryExists(UserDataPaths.HistoryDirectory);
             if (File.Exists(HistoryFilePath))
             {
                 var json = File.ReadAllText(HistoryFilePath);
@@ -460,6 +461,7 @@ public partial class FloatingWindowViewModel : ObservableObject
     {
         try
         {
+            UserDataPaths.EnsureDirectoryExists(UserDataPaths.HistoryDirectory);
             var json = JsonSerializer.Serialize(History.ToList(), new JsonSerializerOptions
             {
                 WriteIndented = true

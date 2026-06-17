@@ -1,0 +1,87 @@
+name: SonarQube Scan
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    # 每天 UTC 02:00 定时扫描
+    - cron: '0 2 * * *'
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  sonar:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Cache SonarQube packages
+        uses: actions/cache@v4
+        with:
+          path: ~\sonar\cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+
+      - name: Install dotnet-sonarscanner
+        run: dotnet tool install --global dotnet-sonarscanner
+
+      - name: Begin SonarQube scan
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        shell: pwsh
+        run: |
+          dotnet sonarscanner begin `
+            /k:"TranslateTool_TranslateTool" `
+            /o:"TranslateTool" `
+            /d:sonar.token="$env:SONAR_TOKEN" `
+            /d:sonar.host.url="https://sonarcloud.io" `
+            /d:sonar.cs.opencover.reportPaths="src/Tests/coverage.opencover.xml" `
+            /d:sonar.cs.vstest.reportsPaths="**/TestResults/*.trx"
+
+      - name: Build
+        run: dotnet build "src/TranslateTool.csproj" --configuration Release --no-incremental
+
+      - name: Test with coverage
+        run: |
+          dotnet test "src/Tests/TranslateTool.Tests.csproj" `
+            --configuration Release `
+            --no-build `
+            --collect:"XPlat Code Coverage" `
+            --results-directory:TestResults `
+            --logger:trx `
+            -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover `
+               DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.IncludeTestAssembly=false `
+               DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.SingleHit=false `
+               DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.UseSourceFileTrustLevel=true
+
+      - name: End SonarQube scan
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        shell: pwsh
+        run: dotnet sonarscanner end /d:sonar.token="$env:SONAR_TOKEN"
+
+      - name: SonarQube Quality Gate check
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          # 如未通过 quality gate，PR 检查会失败
+          $response = Invoke-RestMethod `
+            -Uri "https://sonarcloud.io/api/qualitygate/project_status?projectKey=TranslateTool_TranslateTool" `
+            -Headers @{ Authorization = "Bearer $env:SONAR_TOKEN" }
+          if ($response.projectStatus.status -ne "OK") {
+            Write-Error "Quality Gate 未通过: $($response.projectStatus.status)"
+            exit 1
+          }
+          Write-Host "✓ Quality Gate 通过"

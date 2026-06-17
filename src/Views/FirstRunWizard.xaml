@@ -89,7 +89,9 @@
                                 Style="{StaticResource ClaudeButtonSecondary}"
                                 HorizontalAlignment="Left"
                                 Margin="38,0,0,0"
-                                Click="DownloadOcr_Click"/>
+                                Click="DownloadOcr_Click"
+                                AutomationProperties.Name="下载 OCR 语言包"
+                                AutomationProperties.HelpText="下载 Tesseract OCR 中文和英文语言包"/>
                     </StackPanel>
                 </Border>
 
@@ -129,13 +131,17 @@
                                        Margin="0,0,0,4"/>
                             <TextBox x:Name="BaiduAppIdBox"
                                      Style="{StaticResource InputBox}"
-                                     Margin="0,0,0,10"/>
+                                     Margin="0,0,0,10"
+                                     AutomationProperties.Name="百度翻译 App ID"
+                                     AutomationProperties.HelpText="输入百度翻译 App ID"/>
                             <TextBlock Text="Secret Key"
                                        FontSize="12"
                                        Foreground="{StaticResource ClaudeTextSecondary}"
                                        Margin="0,0,0,4"/>
                             <TextBox x:Name="BaiduSecretKeyBox"
-                                     Style="{StaticResource InputBox}"/>
+                                     Style="{StaticResource InputBox}"
+                                     AutomationProperties.Name="百度翻译 Secret Key"
+                                     AutomationProperties.HelpText="输入百度翻译 Secret Key"/>
                         </StackPanel>
                     </StackPanel>
                 </Border>
@@ -154,10 +160,14 @@
             <Button Content="跳过"
                     Style="{StaticResource ClaudeButtonSecondary}"
                     Click="Skip_Click"
-                    Margin="0,0,10,0"/>
+                    Margin="0,0,10,0"
+                    AutomationProperties.Name="跳过"
+                    AutomationProperties.HelpText="跳过首次配置，稍后在设置中配置"/>
             <Button Content="完成配置"
                     Style="{StaticResource ClaudeButtonPrimary}"
-                    Click="Finish_Click"/>
+                    Click="Finish_Click"
+                    AutomationProperties.Name="完成配置"
+                    AutomationProperties.HelpText="保存配置并开始使用"/>
         </StackPanel>
     </Grid>
 </Window>

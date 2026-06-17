@@ -1,4 +1,4 @@
-﻿<Window x:Class="TranslateTool.Views.SettingsWindow"
+<Window x:Class="TranslateTool.Views.SettingsWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="翻译工具设置"
@@ -60,7 +60,8 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <StackPanel Grid.Row="0" Margin="0,0,0,16">
+        <StackPanel Grid.Row="0" Margin="0,0,0,16"
+                    AutomationProperties.Name="设置标题">
             <TextBlock Text="API 配置"
                        FontSize="22"
                        FontWeight="Bold"
@@ -79,15 +80,23 @@
                         <TextBlock Style="{StaticResource SectionDesc}" Text="免费 200 万字符/月"/>
 
                         <TextBlock Style="{StaticResource FieldLabel}" Text="App ID"/>
-                        <TextBox Style="{StaticResource InputBox}" Text="{Binding BaiduAppId, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox Style="{StaticResource InputBox}"
+                                 Text="{Binding BaiduAppId, UpdateSourceTrigger=PropertyChanged}"
+                                 AutomationProperties.Name="百度翻译 App ID"
+                                 AutomationProperties.HelpText="输入百度翻译的 App ID"/>
 
                         <TextBlock Style="{StaticResource FieldLabel}" Text="Secret Key"/>
-                        <TextBox Style="{StaticResource InputBox}" Text="{Binding BaiduSecretKey, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox Style="{StaticResource InputBox}"
+                                 Text="{Binding BaiduSecretKey, UpdateSourceTrigger=PropertyChanged}"
+                                 AutomationProperties.Name="百度翻译 Secret Key"
+                                 AutomationProperties.HelpText="输入百度翻译的 Secret Key"/>
 
                         <Button Content="清除百度密钥"
                                 Style="{DynamicResource ClaudeButtonDanger}"
                                 Command="{Binding ClearBaiduCredentialsCommand}"
-                                HorizontalAlignment="Left"/>
+                                HorizontalAlignment="Left"
+                                AutomationProperties.Name="清除百度密钥"
+                                AutomationProperties.HelpText="删除已保存的百度翻译 API 密钥"/>
                     </StackPanel>
                 </Border>
 
@@ -97,12 +106,17 @@
                         <TextBlock Style="{StaticResource SectionDesc}" Text="翻译质量最佳 · 免费版 50 万字符/月"/>
 
                         <TextBlock Style="{StaticResource FieldLabel}" Text="API Key"/>
-                        <TextBox Style="{StaticResource InputBox}" Text="{Binding DeepLApiKey, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox Style="{StaticResource InputBox}"
+                                 Text="{Binding DeepLApiKey, UpdateSourceTrigger=PropertyChanged}"
+                                 AutomationProperties.Name="DeepL API Key"
+                                 AutomationProperties.HelpText="输入 DeepL 翻译的 API Key"/>
 
                         <Button Content="清除 DeepL 密钥"
                                 Style="{DynamicResource ClaudeButtonDanger}"
                                 Command="{Binding ClearDeepLKeyCommand}"
-                                HorizontalAlignment="Left"/>
+                                HorizontalAlignment="Left"
+                                AutomationProperties.Name="清除 DeepL 密钥"
+                                AutomationProperties.HelpText="删除已保存的 DeepL API Key"/>
                     </StackPanel>
                 </Border>
 
@@ -112,21 +126,53 @@
                         <TextBlock Style="{StaticResource SectionDesc}" Text="自定义显示/隐藏悬浮窗的全局快捷键，重启应用后生效"/>
 
                         <TextBlock Style="{StaticResource FieldLabel}" Text="修饰键"/>
-                        <ComboBox SelectedItem="{Binding HotkeyModifiers}" Margin="0,0,0,14">
-                            <ComboBoxItem Content="Ctrl+Shift"/>
-                            <ComboBoxItem Content="Ctrl+Alt"/>
-                            <ComboBoxItem Content="Ctrl"/>
-                            <ComboBoxItem Content="Alt"/>
+                        <ComboBox SelectedItem="{Binding HotkeyModifiers}" Margin="0,0,0,14"
+                                  AutomationProperties.Name="快捷键修饰键"
+                                  AutomationProperties.HelpText="选择全局快捷键的修饰键组合">
+                            <ComboBoxItem Content="Ctrl+Shift" AutomationProperties.Name="Ctrl 加 Shift"/>
+                            <ComboBoxItem Content="Ctrl+Alt" AutomationProperties.Name="Ctrl 加 Alt"/>
+                            <ComboBoxItem Content="Ctrl" AutomationProperties.Name="Ctrl"/>
+                            <ComboBoxItem Content="Alt" AutomationProperties.Name="Alt"/>
                         </ComboBox>
 
                         <TextBlock Style="{StaticResource FieldLabel}" Text="按键"/>
-                        <ComboBox SelectedItem="{Binding HotkeyKey}" Margin="0,0,0,8">
-                            <ComboBoxItem Content="T"/>
-                            <ComboBoxItem Content="Q"/>
-                            <ComboBoxItem Content="W"/>
-                            <ComboBoxItem Content="E"/>
-                            <ComboBoxItem Content="R"/>
+                        <ComboBox SelectedItem="{Binding HotkeyKey}" Margin="0,0,0,8"
+                                  AutomationProperties.Name="快捷键按键"
+                                  AutomationProperties.HelpText="选择全局快捷键的主按键">
+                            <ComboBoxItem Content="T" AutomationProperties.Name="T"/>
+                            <ComboBoxItem Content="Q" AutomationProperties.Name="Q"/>
+                            <ComboBoxItem Content="W" AutomationProperties.Name="W"/>
+                            <ComboBoxItem Content="E" AutomationProperties.Name="E"/>
+                            <ComboBoxItem Content="R" AutomationProperties.Name="R"/>
                         </ComboBox>
+                    </StackPanel>
+                </Border>
+
+                <Border Style="{StaticResource SectionCard}">
+                    <StackPanel>
+                        <TextBlock Style="{StaticResource SectionHeader}" Text="隐私与数据"/>
+                        <TextBlock Style="{StaticResource SectionDesc}" Text="查看、导出或删除本应用在本地保存的所有数据"/>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                            <Button Content="📊 查看数据摘要"
+                                    Style="{DynamicResource ClaudeButtonSecondary}"
+                                    Command="{Binding ShowDataSummaryCommand}"
+                                    Margin="0,0,8,0"
+                                    AutomationProperties.Name="查看数据摘要"
+                                    AutomationProperties.HelpText="显示本地存储的所有数据及其大小"/>
+                            <Button Content="📤 导出我的数据"
+                                    Style="{DynamicResource ClaudeButtonSecondary}"
+                                    Command="{Binding ExportUserDataCommand}"
+                                    AutomationProperties.Name="导出我的数据"
+                                    AutomationProperties.HelpText="将所有本地数据导出为 ZIP 压缩包或 JSON 文件"/>
+                        </StackPanel>
+
+                        <Button Content="🗑️ 删除所有本地数据"
+                                Style="{DynamicResource ClaudeButtonDanger}"
+                                Command="{Binding DeleteUserDataCommand}"
+                                HorizontalAlignment="Left"
+                                AutomationProperties.Name="删除所有本地数据"
+                                AutomationProperties.HelpText="清除所有设置、历史和缓存（不可撤销）"/>
                     </StackPanel>
                 </Border>
             </StackPanel>
@@ -145,9 +191,13 @@
 
                 <StackPanel Grid.Column="1" Orientation="Horizontal">
                     <Button Content="取消" Style="{DynamicResource ClaudeButtonSecondary}"
-                            Command="{Binding CancelCommand}" Margin="0,0,10,0"/>
+                            Command="{Binding CancelCommand}" Margin="0,0,10,0"
+                            AutomationProperties.Name="取消"
+                            AutomationProperties.HelpText="放弃修改并关闭设置窗口"/>
                     <Button Content="保存设置" Style="{DynamicResource ClaudeButtonPrimary}"
-                            Command="{Binding SaveCommand}"/>
+                            Command="{Binding SaveCommand}"
+                            AutomationProperties.Name="保存设置"
+                            AutomationProperties.HelpText="保存 API 和快捷键配置"/>
                 </StackPanel>
             </Grid>
         </Border>

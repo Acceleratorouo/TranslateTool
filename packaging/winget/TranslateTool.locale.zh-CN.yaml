@@ -1,0 +1,33 @@
+PackageIdentifier: TranslateTool.TranslateTool
+PackageVersion: 1.0.0
+PackageLocale: zh-CN
+Publisher: TranslateTool
+PackageName: 翻译工具
+License: MIT
+ShortDescription: 集成百度/Google/微软/DeepL 的桌面翻译工具
+Description: |-
+  翻译工具是一款 Windows 桌面翻译应用，集成四大翻译引擎：百度、Google、微软、DeepL。
+
+  主要功能：
+  - 剪贴板自动翻译（复制即翻译）
+  - 框选 OCR 翻译（屏幕取词）
+  - 文件翻译（.txt、.docx、.pdf）
+  - 多引擎对比（同时调用 4 个引擎对比结果）
+  - 翻译历史与缓存
+  - 深色 / 浅色主题切换
+  - RTL 语言支持（阿拉伯文、希伯来文、波斯文、乌尔都文）
+  - 完整键盘导航与屏幕阅读器支持
+  - GDPR 合规：所有数据本地存储，一键导出/删除
+  - 可自定义全局快捷键
+  - 系统托盘集成
+
+  无遥测。无分析。无后台上传。快速、离线优先的翻译工具。
+Moniker: translatetool
+Tags:
+- 翻译
+- 翻译工具
+- OCR
+- 剪贴板
+- 多语言
+ManifestType: locale
+ManifestVersion: 1.6.0
