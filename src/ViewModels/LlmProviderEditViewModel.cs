@@ -43,7 +43,7 @@ public partial class LlmProviderEditViewModel : ObservableObject
 
     public LlmProvider? EditingProvider { get; }
 
-    public ObservableCollection<string> ApiFormatOptions { get; } = new() { "OpenAiCompatible", "Ollama", "Gemini" };
+    public ObservableCollection<string> ApiFormatOptions { get; } = new() { "OpenAiCompatible", "Ollama", "Gemini", "Anthropic" };
 
     public LlmProviderEditViewModel(LlmProvider? provider = null)
     {

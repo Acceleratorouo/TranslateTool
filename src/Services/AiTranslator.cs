@@ -133,6 +133,9 @@ public class AiTranslator : ITranslator
             LlmApiFormat.OpenAiCompatible or LlmApiFormat.Ollama => new OpenAiCompatibleClient(
                 provider,
                 TimeSpan.FromSeconds(LlmProviderService.Settings.TimeoutSeconds)),
+            LlmApiFormat.Anthropic => new AnthropicClient(
+                provider,
+                TimeSpan.FromSeconds(LlmProviderService.Settings.TimeoutSeconds)),
             LlmApiFormat.Gemini => throw new NotSupportedException(
                 "Gemini 原生 API 格式暂不支持，请使用 OpenAI 兼容格式（将 BaseUrl 改为 Gemini 的 OpenAI 兼容端点）。"),
             _ => throw new NotSupportedException($"不支持的 API 格式: {provider.ApiFormat}")

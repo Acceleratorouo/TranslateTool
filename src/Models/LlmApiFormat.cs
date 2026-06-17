@@ -4,5 +4,6 @@ public enum LlmApiFormat
 {
     OpenAiCompatible,
     Ollama,
-    Gemini
+    Gemini,
+    Anthropic
 }

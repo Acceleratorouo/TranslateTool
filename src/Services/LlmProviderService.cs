@@ -89,6 +89,16 @@ public static class LlmProviderService
             },
             new LlmProvider
             {
+                DisplayName = "Anthropic Claude",
+                Notes = "Anthropic Messages 原生 API，需 x-api-key 鉴权",
+                HomepageUrl = "https://console.anthropic.com",
+                BaseUrl = "https://api.anthropic.com/v1",
+                ApiFormat = LlmApiFormat.Anthropic,
+                AuthHeader = "x-api-key",
+                AuthPrefix = ""
+            },
+            new LlmProvider
+            {
                 DisplayName = "DeepSeek",
                 HomepageUrl = "https://platform.deepseek.com",
                 BaseUrl = "https://api.deepseek.com/v1",
@@ -155,8 +165,14 @@ public static class LlmProviderService
             throw new NotSupportedException("Gemini API 格式暂不支持测试连接，请使用 OpenAI-compatible 格式。");
         }
 
-        using var client = new OpenAiCompatibleClient(provider, TimeSpan.FromSeconds(15));
-        var models = await client.ListModelsAsync(ct);
-        provider.Models = models.ToList();
+        ILlmClient client = provider.ApiFormat == LlmApiFormat.Anthropic
+            ? new AnthropicClient(provider, TimeSpan.FromSeconds(15))
+            : new OpenAiCompatibleClient(provider, TimeSpan.FromSeconds(15));
+
+        using (client)
+        {
+            var models = await client.ListModelsAsync(ct);
+            provider.Models = models.ToList();
+        }
     }
 }

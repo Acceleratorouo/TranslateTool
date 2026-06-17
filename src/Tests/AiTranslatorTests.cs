@@ -107,4 +107,30 @@ public class AiTranslatorTests
         var translator = new AiTranslator();
         Assert.IsAssignableFrom<ITranslator>(translator);
     }
+
+    [Fact]
+    public async Task TranslateAsync_ReturnsError_WhenAnthropicProviderWithoutApiKey()
+    {
+        // Anthropic provider without API key will fail at HTTP request level
+        var provider = new LlmProvider
+        {
+            Id = "test-anthropic",
+            DisplayName = "Test Anthropic",
+            IsEnabled = true,
+            IsDefault = true,
+            ApiFormat = LlmApiFormat.Anthropic,
+            BaseUrl = "https://api.anthropic.com/v1",
+            Models = new List<string> { "claude-3-5-haiku-20241022" }
+        };
+        LlmProviderService.Providers.Add(provider);
+        LlmProviderService.Settings.DefaultModel = "claude-3-5-haiku-20241022";
+        LlmProviderService.Settings.TimeoutSeconds = 5;
+
+        var translator = new AiTranslator();
+        var result = await translator.TranslateAsync("hello", "en", "zh-CN");
+
+        // Should fail with HTTP error (no API key), not NotSupportedException
+        Assert.False(result.IsSuccess);
+        Assert.DoesNotContain("不支持", result.ErrorMessage);
+    }
 }
