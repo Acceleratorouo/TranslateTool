@@ -7,7 +7,7 @@ namespace TranslateTool.Services;
 /// - <see cref="ChatCompletionAsync"/>：发起对话补全请求并返回文本结果
 /// - <see cref="ListModelsAsync"/>：拉取服务端可用模型列表
 /// </summary>
-public interface ILlmClient
+public interface ILlmClient : IDisposable
 {
     /// <summary>
     /// 调用对话补全接口，返回模型生成的文本内容。

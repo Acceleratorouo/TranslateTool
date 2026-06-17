@@ -231,4 +231,39 @@
   <data name="TranslationFailed" xml:space="preserve">
     <value>Translation failed: {0}</value>
   </data>
+
+  <!-- AI Translation -->
+  <data name="AiTranslation" xml:space="preserve">
+    <value>AI Translation</value>
+  </data>
+  <data name="AiTranslationSettings" xml:space="preserve">
+    <value>AI Translation Settings</value>
+  </data>
+  <data name="AiTranslationDesc" xml:space="preserve">
+    <value>Configure LLM providers. Local Gemma 4 E4B is the default source.</value>
+  </data>
+  <data name="AiProvider" xml:space="preserve">
+    <value>Providers</value>
+  </data>
+  <data name="AiAddFromTemplate" xml:space="preserve">
+    <value>Add from Template</value>
+  </data>
+  <data name="AiAddCustom" xml:space="preserve">
+    <value>Add Custom</value>
+  </data>
+  <data name="AiDeployLocalGemma" xml:space="preserve">
+    <value>Deploy Local Gemma 4 E4B</value>
+  </data>
+  <data name="AiTestConnection" xml:space="preserve">
+    <value>Test &amp; Fetch Models</value>
+  </data>
+  <data name="AiEditProvider" xml:space="preserve">
+    <value>Edit AI Provider</value>
+  </data>
+  <data name="AiSelectTemplate" xml:space="preserve">
+    <value>Select Provider Template</value>
+  </data>
+  <data name="AiSettingsSaved" xml:space="preserve">
+    <value>✅ AI translation settings saved</value>
+  </data>
 </root>

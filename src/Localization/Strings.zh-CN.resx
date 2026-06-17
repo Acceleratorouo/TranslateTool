@@ -231,4 +231,39 @@
   <data name="TranslationFailed" xml:space="preserve">
     <value>翻译失败: {0}</value>
   </data>
+
+  <!-- AI 翻译 -->
+  <data name="AiTranslation" xml:space="preserve">
+    <value>AI 翻译</value>
+  </data>
+  <data name="AiTranslationSettings" xml:space="preserve">
+    <value>AI 翻译设置</value>
+  </data>
+  <data name="AiTranslationDesc" xml:space="preserve">
+    <value>配置 LLM 供应商，本地 Gemma 4 E4B 为默认源</value>
+  </data>
+  <data name="AiProvider" xml:space="preserve">
+    <value>供应商</value>
+  </data>
+  <data name="AiAddFromTemplate" xml:space="preserve">
+    <value>从模板添加</value>
+  </data>
+  <data name="AiAddCustom" xml:space="preserve">
+    <value>自定义添加</value>
+  </data>
+  <data name="AiDeployLocalGemma" xml:space="preserve">
+    <value>部署本地 Gemma 4 E4B</value>
+  </data>
+  <data name="AiTestConnection" xml:space="preserve">
+    <value>测试并获取模型</value>
+  </data>
+  <data name="AiEditProvider" xml:space="preserve">
+    <value>编辑 AI 供应商</value>
+  </data>
+  <data name="AiSelectTemplate" xml:space="preserve">
+    <value>选择供应商模板</value>
+  </data>
+  <data name="AiSettingsSaved" xml:space="preserve">
+    <value>✅ AI 翻译设置已保存</value>
+  </data>
 </root>
