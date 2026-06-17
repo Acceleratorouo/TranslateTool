@@ -90,16 +90,16 @@ public class TextDirectionHelperTests
     public void TextToFlowDirectionConverter_ConvertsCorrectly()
     {
         var conv = new TextToFlowDirectionConverter();
-        Assert.Equal(SysFlowDirection.RightToLeft, conv.Convert("مرحبا", typeof(SysFlowDirection), null, System.Globalization.CultureInfo.CurrentCulture));
-        Assert.Equal(SysFlowDirection.LeftToRight, conv.Convert("Hello", typeof(SysFlowDirection), null, System.Globalization.CultureInfo.CurrentCulture));
+        Assert.Equal(SysFlowDirection.RightToLeft, conv.Convert("مرحبا", typeof(SysFlowDirection), null!, System.Globalization.CultureInfo.CurrentCulture));
+        Assert.Equal(SysFlowDirection.LeftToRight, conv.Convert("Hello", typeof(SysFlowDirection), null!, System.Globalization.CultureInfo.CurrentCulture));
     }
 
     [Fact]
     public void TextToAlignmentConverter_RtlText_ReturnsRight()
     {
         var conv = new TextToAlignmentConverter();
-        Assert.Equal(SysTextAlignment.Right, conv.Convert("مرحبا", typeof(SysTextAlignment), null, System.Globalization.CultureInfo.CurrentCulture));
-        Assert.Equal(SysTextAlignment.Left, conv.Convert("Hello", typeof(SysTextAlignment), null, System.Globalization.CultureInfo.CurrentCulture));
+        Assert.Equal(SysTextAlignment.Right, conv.Convert("مرحبا", typeof(SysTextAlignment), null!, System.Globalization.CultureInfo.CurrentCulture));
+        Assert.Equal(SysTextAlignment.Left, conv.Convert("Hello", typeof(SysTextAlignment), null!, System.Globalization.CultureInfo.CurrentCulture));
     }
 
     [Fact]
