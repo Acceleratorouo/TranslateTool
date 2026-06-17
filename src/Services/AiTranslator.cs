@@ -77,6 +77,7 @@ public class AiTranslator : ITranslator
             var systemPrompt = LlmProviderService.Settings.SystemPrompt;
             var userPrompt = BuildPrompt(text, sourceLanguage, targetLanguage);
 
+            // 注意：LLM 调用不重试，避免增加延迟和成本
             var translated = await client.ChatCompletionAsync(
                 model,
                 systemPrompt,
@@ -122,7 +123,8 @@ public class AiTranslator : ITranslator
     }
 
     /// <summary>
-    /// 根据供应商配置创建 LLM 客户端
+    /// 根据供应商配置创建 LLM 客户端。
+    /// 注意：Gemini 原生 API 格式暂不支持，请使用 OpenAI 兼容格式。
     /// </summary>
     private static ILlmClient CreateClient(LlmProvider provider)
     {
@@ -131,9 +133,8 @@ public class AiTranslator : ITranslator
             LlmApiFormat.OpenAiCompatible or LlmApiFormat.Ollama => new OpenAiCompatibleClient(
                 provider,
                 TimeSpan.FromSeconds(LlmProviderService.Settings.TimeoutSeconds)),
-            LlmApiFormat.Gemini => new OpenAiCompatibleClient(
-                provider,
-                TimeSpan.FromSeconds(LlmProviderService.Settings.TimeoutSeconds)),
+            LlmApiFormat.Gemini => throw new NotSupportedException(
+                "Gemini 原生 API 格式暂不支持，请使用 OpenAI 兼容格式（将 BaseUrl 改为 Gemini 的 OpenAI 兼容端点）。"),
             _ => throw new NotSupportedException($"不支持的 API 格式: {provider.ApiFormat}")
         };
     }
