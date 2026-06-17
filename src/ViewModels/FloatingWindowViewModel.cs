@@ -152,6 +152,10 @@ public partial class FloatingWindowViewModel : ObservableObject
 
         LoadHistory();
         StartClipboardMonitor();
+
+        // 从设置加载语言偏好
+        _sourceLanguage = MapCodeToLanguage(Settings.SourceLanguage);
+        _targetLanguage = MapCodeToLanguage(Settings.TargetLanguage);
     }
 
     /// <summary>
@@ -250,6 +254,23 @@ public partial class FloatingWindowViewModel : ObservableObject
             "西班牙文" => "es",
             "俄文" => "ru",
             _ => "auto"
+        };
+    }
+
+    private static string MapCodeToLanguage(string code)
+    {
+        return code switch
+        {
+            "auto" => "自动",
+            "zh-CN" => "中文",
+            "en" => "英文",
+            "ja" => "日文",
+            "ko" => "韩文",
+            "fr" => "法文",
+            "de" => "德文",
+            "es" => "西班牙文",
+            "ru" => "俄文",
+            _ => "自动"
         };
     }
 

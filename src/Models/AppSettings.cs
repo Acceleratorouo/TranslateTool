@@ -39,6 +39,10 @@ public class AppSettings
     public string HotkeyModifiers { get; set; } = "Ctrl+Shift"; // Ctrl, Ctrl+Shift, Alt, Win
     public string HotkeyKey { get; set; } = "T"; // A-Z, 0-9, F1-F12
 
+    // 框选翻译快捷键
+    public string RegionTranslateHotkeyModifiers { get; set; } = "Ctrl+Shift";
+    public string RegionTranslateHotkeyKey { get; set; } = "R";
+
     // 首次运行引导
     public bool FirstRunCompleted { get; set; } = false;
 

@@ -101,6 +101,17 @@ public partial class App : System.Windows.Application
             NativeMethods.VK_X,
             "Ctrl+Shift+X（划词翻译）");
 
+        // 注册框选翻译热键（用户可自定义）
+        var (regionMods, regionVk) = ParseHotkey(
+            AppSettings.Current.RegionTranslateHotkeyModifiers,
+            AppSettings.Current.RegionTranslateHotkeyKey);
+        RegisterHotKeyWithErrorHandling(
+            _floatingWindowHandle,
+            NativeMethods.HOTKEY_REGION_TRANSLATE,
+            regionMods,
+            regionVk,
+            $"{AppSettings.Current.RegionTranslateHotkeyModifiers}+{AppSettings.Current.RegionTranslateHotkeyKey}（框选翻译）");
+
         // 创建托盘图标
         var iconPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "TranslateTool.ico");
         System.Drawing.Icon trayIcon;
@@ -266,7 +277,7 @@ public partial class App : System.Windows.Application
         });
 
         // 快捷键提示
-        contextMenu.Items.Add(new ToolStripMenuItem("快捷键: Ctrl+Shift+T 显示 | Ctrl+Shift+X 划词翻译") { Enabled = false });
+        contextMenu.Items.Add(new ToolStripMenuItem($"快捷键: Ctrl+Shift+T 显示 | Ctrl+Shift+X 划词翻译 | {AppSettings.Current.RegionTranslateHotkeyModifiers}+{AppSettings.Current.RegionTranslateHotkeyKey} 框选翻译") { Enabled = false });
 
         contextMenu.Items.Add(new ToolStripSeparator());
 
@@ -312,6 +323,14 @@ public partial class App : System.Windows.Application
                 vm.SelectionTranslate();
                 handled = true;
             }
+            else if (hotkeyId == NativeMethods.HOTKEY_REGION_TRANSLATE)
+            {
+                // 框选翻译热键
+                ShowFloatingWindow();
+                var vm = Services.GetRequiredService<FloatingWindowViewModel>();
+                vm.RegionTranslateCommand.Execute(null);
+                handled = true;
+            }
         }
 
         return IntPtr.Zero;
@@ -323,6 +342,7 @@ public partial class App : System.Windows.Application
         {
             NativeMethods.UnregisterHotKey(_floatingWindowHandle, NativeMethods.HOTKEY_TOGGLE_WINDOW);
             NativeMethods.UnregisterHotKey(_floatingWindowHandle, NativeMethods.HOTKEY_SELECTION_TRANSLATE);
+            NativeMethods.UnregisterHotKey(_floatingWindowHandle, NativeMethods.HOTKEY_REGION_TRANSLATE);
         }
 
         // 保存翻译缓存
@@ -356,6 +376,30 @@ public partial class App : System.Windows.Application
             "热键注册失败",
             MessageBoxButton.OK,
             MessageBoxImage.Warning);
+    }
+
+    /// <summary>
+    /// 将快捷键字符串配置解析为 RegisterHotKey 所需的修饰符和虚拟键码。
+    /// </summary>
+    private static (uint modifiers, uint vk) ParseHotkey(string modifiersStr, string keyStr)
+    {
+        uint mods = 0;
+        if (modifiersStr.Contains("Ctrl", StringComparison.OrdinalIgnoreCase))
+            mods |= NativeMethods.ModControl;
+        if (modifiersStr.Contains("Shift", StringComparison.OrdinalIgnoreCase))
+            mods |= NativeMethods.ModShift;
+
+        // 解析按键：A-Z 映射为 0x41-0x5A
+        uint vk = keyStr.ToUpperInvariant() switch
+        {
+            "T" => NativeMethods.VK_T,
+            "X" => NativeMethods.VK_X,
+            "R" => NativeMethods.VK_R,
+            var c when c.Length == 1 && c[0] >= 'A' && c[0] <= 'Z' => (uint)(c[0] - 'A' + 0x41),
+            _ => NativeMethods.VK_R
+        };
+
+        return (mods, vk);
     }
 
     private static void ShowFloatingWindow()

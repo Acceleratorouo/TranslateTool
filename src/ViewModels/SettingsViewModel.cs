@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using TranslateTool.Models;
@@ -36,6 +37,26 @@ public partial class SettingsViewModel : ObservableObject
     [ObservableProperty]
     private bool _enableDockHide = true;
 
+    [ObservableProperty]
+    private string _sourceLanguage = "自动";
+
+    [ObservableProperty]
+    private string _targetLanguage = "中文";
+
+    [ObservableProperty]
+    private string _regionTranslateHotkeyModifiers = "Ctrl+Shift";
+
+    [ObservableProperty]
+    private string _regionTranslateHotkeyKey = "R";
+
+    /// <summary>
+    /// 可选语言列表（与悬浮窗一致）
+    /// </summary>
+    public ObservableCollection<string> AvailableLanguages { get; } = new()
+    {
+        "自动", "中文", "英文", "日文", "韩文", "法文", "德文", "西班牙文", "俄文"
+    };
+
     public SettingsViewModel()
     {
         _settings = AppSettings.Current;
@@ -49,6 +70,10 @@ public partial class SettingsViewModel : ObservableObject
         _showToastOnTranslate = _settings.ShowToastOnTranslate;
         _enableSelectionTranslate = _settings.EnableSelectionTranslate;
         _enableDockHide = _settings.EnableDockHide;
+        _sourceLanguage = MapCodeToLanguage(_settings.SourceLanguage);
+        _targetLanguage = MapCodeToLanguage(_settings.TargetLanguage);
+        _regionTranslateHotkeyModifiers = _settings.RegionTranslateHotkeyModifiers ?? "Ctrl+Shift";
+        _regionTranslateHotkeyKey = _settings.RegionTranslateHotkeyKey ?? "R";
     }
 
     partial void OnShowToastOnTranslateChanged(bool value)
@@ -78,6 +103,10 @@ public partial class SettingsViewModel : ObservableObject
         _settings.DeepLApiKey = string.IsNullOrWhiteSpace(DeepLApiKey) ? null : DeepLApiKey.Trim();
         _settings.HotkeyModifiers = HotkeyModifiers;
         _settings.HotkeyKey = HotkeyKey;
+        _settings.SourceLanguage = MapLanguageToCode(SourceLanguage);
+        _settings.TargetLanguage = MapLanguageToCode(TargetLanguage);
+        _settings.RegionTranslateHotkeyModifiers = RegionTranslateHotkeyModifiers;
+        _settings.RegionTranslateHotkeyKey = RegionTranslateHotkeyKey;
 
         // 应用到翻译引擎
         if (_settings.BaiduAppId != null && _settings.BaiduSecretKey != null)
@@ -249,4 +278,38 @@ public partial class SettingsViewModel : ObservableObject
         < 1024 * 1024 => $"{bytes / 1024.0:F1} KB",
         _ => $"{bytes / (1024.0 * 1024.0):F1} MB"
     };
+
+    private static string MapLanguageToCode(string lang)
+    {
+        return lang switch
+        {
+            "自动" => "auto",
+            "中文" => "zh-CN",
+            "英文" => "en",
+            "日文" => "ja",
+            "韩文" => "ko",
+            "法文" => "fr",
+            "德文" => "de",
+            "西班牙文" => "es",
+            "俄文" => "ru",
+            _ => "auto"
+        };
+    }
+
+    private static string MapCodeToLanguage(string code)
+    {
+        return code switch
+        {
+            "auto" => "自动",
+            "zh-CN" => "中文",
+            "en" => "英文",
+            "ja" => "日文",
+            "ko" => "韩文",
+            "fr" => "法文",
+            "de" => "德文",
+            "es" => "西班牙文",
+            "ru" => "俄文",
+            _ => "自动"
+        };
+    }
 }

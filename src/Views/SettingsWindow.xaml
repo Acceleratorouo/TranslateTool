@@ -123,28 +123,70 @@
 
                 <Border Style="{StaticResource SectionCard}">
                     <StackPanel>
-                        <TextBlock Style="{StaticResource SectionHeader}" Text="快捷键配置"/>
-                        <TextBlock Style="{StaticResource SectionDesc}" Text="自定义显示/隐藏悬浮窗的全局快捷键，重启应用后生效"/>
+                        <TextBlock Style="{StaticResource SectionHeader}" Text="翻译语言"/>
+                        <TextBlock Style="{StaticResource SectionDesc}" Text="设置默认的源语言和目标语言，悬浮窗启动时会使用此配置"/>
 
-                        <TextBlock Style="{StaticResource FieldLabel}" Text="修饰键"/>
-                        <ComboBox SelectedItem="{Binding HotkeyModifiers}" Margin="0,0,0,14"
-                                  AutomationProperties.Name="快捷键修饰键"
-                                  AutomationProperties.HelpText="选择全局快捷键的修饰键组合">
+                        <TextBlock Style="{StaticResource FieldLabel}" Text="源语言（被翻译语言）"/>
+                        <ComboBox ItemsSource="{Binding AvailableLanguages}"
+                                  SelectedItem="{Binding SourceLanguage}"
+                                  Margin="0,0,0,14"
+                                  AutomationProperties.Name="源语言"
+                                  AutomationProperties.HelpText="选择被翻译的语言，自动为自动检测"/>
+
+                        <TextBlock Style="{StaticResource FieldLabel}" Text="目标语言（翻译结果语言）"/>
+                        <ComboBox ItemsSource="{Binding AvailableLanguages}"
+                                  SelectedItem="{Binding TargetLanguage}"
+                                  Margin="0,0,0,8"
+                                  AutomationProperties.Name="目标语言"
+                                  AutomationProperties.HelpText="选择翻译结果的语言"/>
+                    </StackPanel>
+                </Border>
+
+                <Border Style="{StaticResource SectionCard}">
+                    <StackPanel>
+                        <TextBlock Style="{StaticResource SectionHeader}" Text="快捷键配置"/>
+                        <TextBlock Style="{StaticResource SectionDesc}" Text="自定义全局快捷键，重启应用后生效"/>
+
+                        <TextBlock Style="{StaticResource FieldLabel}" Text="显示/隐藏悬浮窗 — 修饰键"/>
+                        <ComboBox SelectedItem="{Binding HotkeyModifiers}" Margin="0,0,0,10"
+                                  AutomationProperties.Name="悬浮窗快捷键修饰键"
+                                  AutomationProperties.HelpText="选择显示/隐藏悬浮窗的修饰键组合">
                             <ComboBoxItem Content="Ctrl+Shift" AutomationProperties.Name="Ctrl 加 Shift"/>
                             <ComboBoxItem Content="Ctrl+Alt" AutomationProperties.Name="Ctrl 加 Alt"/>
                             <ComboBoxItem Content="Ctrl" AutomationProperties.Name="Ctrl"/>
                             <ComboBoxItem Content="Alt" AutomationProperties.Name="Alt"/>
                         </ComboBox>
 
-                        <TextBlock Style="{StaticResource FieldLabel}" Text="按键"/>
-                        <ComboBox SelectedItem="{Binding HotkeyKey}" Margin="0,0,0,8"
-                                  AutomationProperties.Name="快捷键按键"
-                                  AutomationProperties.HelpText="选择全局快捷键的主按键">
+                        <TextBlock Style="{StaticResource FieldLabel}" Text="显示/隐藏悬浮窗 — 按键"/>
+                        <ComboBox SelectedItem="{Binding HotkeyKey}" Margin="0,0,0,18"
+                                  AutomationProperties.Name="悬浮窗快捷键按键"
+                                  AutomationProperties.HelpText="选择显示/隐藏悬浮窗的主按键">
                             <ComboBoxItem Content="T" AutomationProperties.Name="T"/>
                             <ComboBoxItem Content="Q" AutomationProperties.Name="Q"/>
                             <ComboBoxItem Content="W" AutomationProperties.Name="W"/>
                             <ComboBoxItem Content="E" AutomationProperties.Name="E"/>
                             <ComboBoxItem Content="R" AutomationProperties.Name="R"/>
+                        </ComboBox>
+
+                        <TextBlock Style="{StaticResource FieldLabel}" Text="框选翻译 — 修饰键"/>
+                        <ComboBox SelectedItem="{Binding RegionTranslateHotkeyModifiers}" Margin="0,0,0,10"
+                                  AutomationProperties.Name="框选翻译快捷键修饰键"
+                                  AutomationProperties.HelpText="选择框选翻译的修饰键组合">
+                            <ComboBoxItem Content="Ctrl+Shift" AutomationProperties.Name="Ctrl 加 Shift"/>
+                            <ComboBoxItem Content="Ctrl+Alt" AutomationProperties.Name="Ctrl 加 Alt"/>
+                            <ComboBoxItem Content="Ctrl" AutomationProperties.Name="Ctrl"/>
+                            <ComboBoxItem Content="Alt" AutomationProperties.Name="Alt"/>
+                        </ComboBox>
+
+                        <TextBlock Style="{StaticResource FieldLabel}" Text="框选翻译 — 按键"/>
+                        <ComboBox SelectedItem="{Binding RegionTranslateHotkeyKey}" Margin="0,0,0,8"
+                                  AutomationProperties.Name="框选翻译快捷键按键"
+                                  AutomationProperties.HelpText="选择框选翻译的主按键">
+                            <ComboBoxItem Content="R" AutomationProperties.Name="R"/>
+                            <ComboBoxItem Content="Q" AutomationProperties.Name="Q"/>
+                            <ComboBoxItem Content="W" AutomationProperties.Name="W"/>
+                            <ComboBoxItem Content="E" AutomationProperties.Name="E"/>
+                            <ComboBoxItem Content="T" AutomationProperties.Name="T"/>
                         </ComboBox>
                     </StackPanel>
                 </Border>

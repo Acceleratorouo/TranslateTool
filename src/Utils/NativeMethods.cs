@@ -26,10 +26,12 @@ public static class NativeMethods
     // 热键 ID
     public const int HOTKEY_TOGGLE_WINDOW = 0xF001;
     public const int HOTKEY_SELECTION_TRANSLATE = 0xF002;
+    public const int HOTKEY_REGION_TRANSLATE = 0xF003;
 
     // 虚拟键码
     public const uint VK_X = 0x58;
     public const uint VK_T = 0x54;
+    public const uint VK_R = 0x52;
 
     // 系统错误码
     public const uint ERROR_HOTKEY_ALREADY_REGISTERED = 1409;
