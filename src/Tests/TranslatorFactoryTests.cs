@@ -3,6 +3,7 @@ using TranslateTool.Services;
 
 namespace TranslateTool.Tests;
 
+[Collection("UserData")]
 public class TranslatorFactoryTests
 {
     [Fact]
@@ -36,6 +37,25 @@ public class TranslatorFactoryTests
         var translator = TranslatorFactory.Create("deepl");
         Assert.NotNull(translator);
         Assert.IsType<DeepLTranslator>(translator);
+    }
+
+    [Fact]
+    public void Create_WithAi_ReturnsAiTranslator()
+    {
+        var translator = TranslatorFactory.Create("ai");
+        Assert.NotNull(translator);
+        Assert.IsType<AiTranslator>(translator);
+        Assert.Equal("AI 翻译", translator.Name);
+    }
+
+    [Theory]
+    [InlineData("AI")]
+    [InlineData("AI翻译")]
+    [InlineData("AI 翻译")]
+    public void Create_WithAiVariations_ReturnsAiTranslator(string engineName)
+    {
+        var translator = TranslatorFactory.Create(engineName);
+        Assert.IsType<AiTranslator>(translator);
     }
 
     [Theory]
@@ -85,14 +105,15 @@ public class TranslatorFactoryTests
     }
 
     [Fact]
-    public void GetAvailableEngines_ReturnsFourEngines()
+    public void GetAvailableEngines_ReturnsFiveEngines()
     {
         var engines = TranslatorFactory.GetAvailableEngines();
-        Assert.Equal(4, engines.Length);
+        Assert.Equal(5, engines.Length);
         Assert.Contains("baidu", engines);
         Assert.Contains("google", engines);
         Assert.Contains("microsoft", engines);
         Assert.Contains("deepl", engines);
+        Assert.Contains("ai", engines);
     }
 
     [Fact]

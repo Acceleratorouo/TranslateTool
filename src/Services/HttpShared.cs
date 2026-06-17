@@ -1,4 +1,4 @@
-﻿using System.Net.Http;
+using System.Net.Http;
 
 namespace TranslateTool.Services;
 
@@ -69,6 +69,15 @@ public class EngineStatus
                 Label = "DeepL 翻译",
                 IsStable = DeepLTranslator.HasApiKey,
                 Note = DeepLTranslator.HasApiKey ? "已配置API Key，翻译质量优秀" : "需要配置API Key（免费版500,000字符/月）"
+            },
+            new EngineStatus
+            {
+                Name = "ai",
+                Label = "AI 翻译",
+                IsStable = LlmProviderService.GetDefaultProvider()?.IsEnabled == true,
+                Note = LlmProviderService.GetDefaultProvider() is { } p
+                    ? $"默认供应商: {p.DisplayName}"
+                    : "需先在设置中配置 AI 翻译供应商"
             }
         ];
     }

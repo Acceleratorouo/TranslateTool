@@ -3,17 +3,18 @@ using TranslateTool.Services;
 
 namespace TranslateTool.Tests;
 
+[Collection("UserData")]
 public class EngineStatusTests
 {
     [Fact]
-    public void GetAll_ReturnsFourEngines()
+    public void GetAll_ReturnsFiveEngines()
     {
         var statuses = EngineStatus.GetAll();
-        Assert.Equal(4, statuses.Length);
+        Assert.Equal(5, statuses.Length);
     }
 
     [Fact]
-    public void GetAll_ContainsBaiduGoogleMicrosoftDeepL()
+    public void GetAll_ContainsBaiduGoogleMicrosoftDeepLAi()
     {
         var statuses = EngineStatus.GetAll();
         var names = statuses.Select(s => s.Name).ToArray();
@@ -22,6 +23,7 @@ public class EngineStatusTests
         Assert.Contains("google", names);
         Assert.Contains("microsoft", names);
         Assert.Contains("deepl", names);
+        Assert.Contains("ai", names);
     }
 
     [Fact]
