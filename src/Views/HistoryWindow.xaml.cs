@@ -1,6 +1,8 @@
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Media.Imaging;
 
 namespace TranslateTool.Views;
 
@@ -11,7 +13,17 @@ public partial class HistoryWindow : Window
     public HistoryWindow()
     {
         InitializeComponent();
+        LoadIcon();
         Loaded += HistoryWindow_Loaded;
+    }
+
+    private void LoadIcon()
+    {
+        var iconPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "TranslateTool.ico");
+        if (File.Exists(iconPath))
+        {
+            Icon = BitmapFrame.Create(new Uri(iconPath, UriKind.Absolute));
+        }
     }
 
     private void HistoryWindow_Loaded(object sender, RoutedEventArgs e)

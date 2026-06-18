@@ -1,5 +1,6 @@
 using System.IO;
 using System.Windows;
+using System.Windows.Media.Imaging;
 using TranslateTool.Models;
 using TranslateTool.Utils;
 
@@ -10,7 +11,17 @@ public partial class FirstRunWizard : Window
     public FirstRunWizard()
     {
         InitializeComponent();
+        LoadIcon();
         CheckOcrStatus();
+    }
+
+    private void LoadIcon()
+    {
+        var iconPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "TranslateTool.ico");
+        if (File.Exists(iconPath))
+        {
+            Icon = BitmapFrame.Create(new Uri(iconPath, UriKind.Absolute));
+        }
     }
 
     private void CheckOcrStatus()
@@ -74,6 +85,7 @@ public partial class FirstRunWizard : Window
         // 标记已完成首次运行引导（跳过也算完成）
         AppSettings.Current.FirstRunCompleted = true;
         AppSettings.Current.Save();
+        DialogResult = true;
         Close();
     }
 
@@ -100,6 +112,7 @@ public partial class FirstRunWizard : Window
         AppSettings.Current.FirstRunCompleted = true;
         AppSettings.Current.Save();
 
+        DialogResult = true;
         Close();
     }
 }

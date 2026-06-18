@@ -20,10 +20,10 @@ public partial class SettingsViewModel : ObservableObject
     private string _deepLApiKey = "";
 
     [ObservableProperty]
-    private string _hotkeyModifiers = "Ctrl+Shift";
+    private string _hotkeyModifiers = "";
 
     [ObservableProperty]
-    private string _hotkeyKey = "T";
+    private string _hotkeyKey = "";
 
     [ObservableProperty]
     private string _statusMessage = "";
@@ -44,10 +44,34 @@ public partial class SettingsViewModel : ObservableObject
     private string _targetLanguage = "中文";
 
     [ObservableProperty]
-    private string _regionTranslateHotkeyModifiers = "Ctrl+Shift";
+    private string _regionTranslateHotkeyModifiers = "";
 
     [ObservableProperty]
-    private string _regionTranslateHotkeyKey = "R";
+    private string _regionTranslateHotkeyKey = "";
+
+    [ObservableProperty]
+    private string _selectionTranslateHotkeyModifiers = "";
+
+    [ObservableProperty]
+    private string _selectionTranslateHotkeyKey = "";
+
+    /// <summary>
+    /// 显示用：悬浮窗快捷键完整字符串
+    /// </summary>
+    public string ToggleWindowHotkeyDisplay =>
+        string.IsNullOrEmpty(HotkeyKey) ? "未设置（点击录制）" : $"{HotkeyModifiers}+{HotkeyKey}";
+
+    /// <summary>
+    /// 显示用：划词翻译快捷键完整字符串
+    /// </summary>
+    public string SelectionTranslateHotkeyDisplay =>
+        string.IsNullOrEmpty(SelectionTranslateHotkeyKey) ? "未设置（点击录制）" : $"{SelectionTranslateHotkeyModifiers}+{SelectionTranslateHotkeyKey}";
+
+    /// <summary>
+    /// 显示用：框选翻译快捷键完整字符串
+    /// </summary>
+    public string RegionTranslateHotkeyDisplay =>
+        string.IsNullOrEmpty(RegionTranslateHotkeyKey) ? "未设置（点击录制）" : $"{RegionTranslateHotkeyModifiers}+{RegionTranslateHotkeyKey}";
 
     /// <summary>
     /// 可选语言列表（与悬浮窗一致）
@@ -65,15 +89,72 @@ public partial class SettingsViewModel : ObservableObject
         _baiduAppId = _settings.BaiduAppId ?? "";
         _baiduSecretKey = _settings.BaiduSecretKey ?? "";
         _deepLApiKey = _settings.DeepLApiKey ?? "";
-        _hotkeyModifiers = _settings.HotkeyModifiers ?? "Ctrl+Shift";
-        _hotkeyKey = _settings.HotkeyKey ?? "T";
+        _hotkeyModifiers = _settings.HotkeyModifiers ?? "";
+        _hotkeyKey = _settings.HotkeyKey ?? "";
         _showToastOnTranslate = _settings.ShowToastOnTranslate;
         _enableSelectionTranslate = _settings.EnableSelectionTranslate;
         _enableDockHide = _settings.EnableDockHide;
         _sourceLanguage = MapCodeToLanguage(_settings.SourceLanguage);
         _targetLanguage = MapCodeToLanguage(_settings.TargetLanguage);
-        _regionTranslateHotkeyModifiers = _settings.RegionTranslateHotkeyModifiers ?? "Ctrl+Shift";
-        _regionTranslateHotkeyKey = _settings.RegionTranslateHotkeyKey ?? "R";
+        _regionTranslateHotkeyModifiers = _settings.RegionTranslateHotkeyModifiers ?? "";
+        _regionTranslateHotkeyKey = _settings.RegionTranslateHotkeyKey ?? "";
+        _selectionTranslateHotkeyModifiers = _settings.SelectionTranslateHotkeyModifiers ?? "";
+        _selectionTranslateHotkeyKey = _settings.SelectionTranslateHotkeyKey ?? "";
+    }
+
+    partial void OnHotkeyModifiersChanged(string value)
+    {
+        OnPropertyChanged(nameof(ToggleWindowHotkeyDisplay));
+        ApplyHotkeyChange();
+    }
+    partial void OnHotkeyKeyChanged(string value)
+    {
+        OnPropertyChanged(nameof(ToggleWindowHotkeyDisplay));
+        ApplyHotkeyChange();
+    }
+    partial void OnSelectionTranslateHotkeyModifiersChanged(string value)
+    {
+        OnPropertyChanged(nameof(SelectionTranslateHotkeyDisplay));
+        ApplyHotkeyChange();
+    }
+    partial void OnSelectionTranslateHotkeyKeyChanged(string value)
+    {
+        OnPropertyChanged(nameof(SelectionTranslateHotkeyDisplay));
+        ApplyHotkeyChange();
+    }
+    partial void OnRegionTranslateHotkeyModifiersChanged(string value)
+    {
+        OnPropertyChanged(nameof(RegionTranslateHotkeyDisplay));
+        ApplyHotkeyChange();
+    }
+    partial void OnRegionTranslateHotkeyKeyChanged(string value)
+    {
+        OnPropertyChanged(nameof(RegionTranslateHotkeyDisplay));
+        ApplyHotkeyChange();
+    }
+
+    /// <summary>
+    /// 快捷键变更后立即保存并重新注册热键（无需重启应用）
+    /// </summary>
+    private void ApplyHotkeyChange()
+    {
+        _settings.HotkeyModifiers = HotkeyModifiers;
+        _settings.HotkeyKey = HotkeyKey;
+        _settings.SelectionTranslateHotkeyModifiers = SelectionTranslateHotkeyModifiers;
+        _settings.SelectionTranslateHotkeyKey = SelectionTranslateHotkeyKey;
+        _settings.RegionTranslateHotkeyModifiers = RegionTranslateHotkeyModifiers;
+        _settings.RegionTranslateHotkeyKey = RegionTranslateHotkeyKey;
+        _settings.Save();
+
+        // 立即重新注册热键
+        try
+        {
+            App.RegisterAllHotkeys();
+        }
+        catch
+        {
+            // 忽略重新注册失败（例如设置窗口未关闭时）
+        }
     }
 
     partial void OnShowToastOnTranslateChanged(bool value)
@@ -107,6 +188,8 @@ public partial class SettingsViewModel : ObservableObject
         _settings.TargetLanguage = MapLanguageToCode(TargetLanguage);
         _settings.RegionTranslateHotkeyModifiers = RegionTranslateHotkeyModifiers;
         _settings.RegionTranslateHotkeyKey = RegionTranslateHotkeyKey;
+        _settings.SelectionTranslateHotkeyModifiers = SelectionTranslateHotkeyModifiers;
+        _settings.SelectionTranslateHotkeyKey = SelectionTranslateHotkeyKey;
 
         // 应用到翻译引擎
         if (_settings.BaiduAppId != null && _settings.BaiduSecretKey != null)

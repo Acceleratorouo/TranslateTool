@@ -35,13 +35,17 @@ public class AppSettings
     // 深色模式
     public bool DarkMode { get; set; } = false;
 
-    // 自定义快捷键
-    public string HotkeyModifiers { get; set; } = "Ctrl+Shift"; // Ctrl, Ctrl+Shift, Alt, Win
-    public string HotkeyKey { get; set; } = "T"; // A-Z, 0-9, F1-F12
+    // 自定义快捷键（默认为空，需用户手动设置）
+    public string HotkeyModifiers { get; set; } = "";
+    public string HotkeyKey { get; set; } = "";
 
     // 框选翻译快捷键
-    public string RegionTranslateHotkeyModifiers { get; set; } = "Ctrl+Shift";
-    public string RegionTranslateHotkeyKey { get; set; } = "R";
+    public string RegionTranslateHotkeyModifiers { get; set; } = "";
+    public string RegionTranslateHotkeyKey { get; set; } = "";
+
+    // 划词翻译快捷键
+    public string SelectionTranslateHotkeyModifiers { get; set; } = "";
+    public string SelectionTranslateHotkeyKey { get; set; } = "";
 
     // 首次运行引导
     public bool FirstRunCompleted { get; set; } = false;

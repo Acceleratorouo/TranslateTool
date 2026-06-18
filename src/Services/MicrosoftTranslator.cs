@@ -1,4 +1,4 @@
-﻿using System.Net;
+using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
@@ -74,7 +74,7 @@ public class MicrosoftTranslator : ITranslator
             request.Headers.Add("Accept", "application/json");
 
             var session = new CookieContainer();
-            var handler = new HttpClientHandler { CookieContainer = session };
+            var handler = new HttpClientHandler { CookieContainer = session, CheckCertificateRevocationList = true };
             using var client = new HttpClient(handler);
             client.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36");
 

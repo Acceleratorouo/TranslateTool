@@ -44,7 +44,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="Resources\TranslateTool.ico" />
     <Content Include="Resources\TranslateTool.ico" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="Resources\TranslateTool.png" CopyToOutputDirectory="PreserveNewest" />
     <Resource Include="Themes\*.xaml" />

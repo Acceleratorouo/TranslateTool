@@ -1,8 +1,10 @@
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media.Animation;
+using System.Windows.Media.Imaging;
 using TranslateTool.Models;
 using TranslateTool.Services;
 using TranslateTool.ViewModels;
@@ -26,6 +28,7 @@ public partial class FloatingWindow : Window
     public FloatingWindow()
     {
         InitializeComponent();
+        LoadIcon();
         AllowDrop = true;
         Drop += FloatingWindow_Drop;
         DragEnter += FloatingWindow_DragEnter;
@@ -42,6 +45,15 @@ public partial class FloatingWindow : Window
         // 初始化正常尺寸
         _normalWidth = Width;
         _normalHeight = Height;
+    }
+
+    private void LoadIcon()
+    {
+        var iconPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "TranslateTool.ico");
+        if (File.Exists(iconPath))
+        {
+            Icon = BitmapFrame.Create(new Uri(iconPath, UriKind.Absolute));
+        }
     }
 
     /// <summary>
@@ -220,12 +232,76 @@ public partial class FloatingWindow : Window
             settingsItem.Items.Add(item);
         }
 
-        menu.Items.Add(pasteItem);
-        menu.Items.Add(fileItem);
-        menu.Items.Add(regionItem);
-        menu.Items.Add(new Separator());
-        menu.Items.Add(historyItem);
-        menu.Items.Add(settingsItem);
+        // 源语言子菜单
+        var sourceLangItem = new MenuItem { Header = "源语言" };
+        if (DataContext is FloatingWindowViewModel vm)
+        {
+            foreach (var lang in vm.Languages)
+            {
+                var item = new MenuItem
+                {
+                    Header = lang,
+                    IsChecked = lang == vm.SourceLanguage,
+                    Tag = lang
+                };
+                item.Click += (_, _) =>
+                {
+                    vm.SourceLanguage = lang;
+                    foreach (MenuItem mi in sourceLangItem.Items)
+                    {
+                        mi.IsChecked = mi.Tag?.ToString() == lang;
+                    }
+                };
+                sourceLangItem.Items.Add(item);
+            }
+
+            // 目标语言子菜单
+            var targetLangItem = new MenuItem { Header = "目标语言" };
+            foreach (var lang in vm.Languages)
+            {
+                var item = new MenuItem
+                {
+                    Header = lang,
+                    IsChecked = lang == vm.TargetLanguage,
+                    Tag = lang
+                };
+                item.Click += (_, _) =>
+                {
+                    vm.TargetLanguage = lang;
+                    foreach (MenuItem mi in targetLangItem.Items)
+                    {
+                        mi.IsChecked = mi.Tag?.ToString() == lang;
+                    }
+                };
+                targetLangItem.Items.Add(item);
+            }
+
+            // 交换语言
+            var swapItem = new MenuItem { Header = "⇄ 交换语言" };
+            swapItem.Click += (_, _) =>
+            {
+                vm.SwapLanguagesCommand.Execute(null);
+            };
+
+            menu.Items.Add(pasteItem);
+            menu.Items.Add(fileItem);
+            menu.Items.Add(regionItem);
+            menu.Items.Add(new Separator());
+            menu.Items.Add(historyItem);
+            menu.Items.Add(settingsItem);
+            menu.Items.Add(sourceLangItem);
+            menu.Items.Add(targetLangItem);
+            menu.Items.Add(swapItem);
+        }
+        else
+        {
+            menu.Items.Add(pasteItem);
+            menu.Items.Add(fileItem);
+            menu.Items.Add(regionItem);
+            menu.Items.Add(new Separator());
+            menu.Items.Add(historyItem);
+            menu.Items.Add(settingsItem);
+        }
 
         // API 设置
         var apiSettingsItem = new MenuItem { Header = "API 设置" };
@@ -323,7 +399,7 @@ public partial class FloatingWindow : Window
     {
         if (DataContext is FloatingWindowViewModel vm)
         {
-            vm.SwitchSourceLangCommand.Execute(null);
+            ShowLanguageMenu(vm, isSource: true);
         }
         e.Handled = true;
     }
@@ -332,9 +408,38 @@ public partial class FloatingWindow : Window
     {
         if (DataContext is FloatingWindowViewModel vm)
         {
-            vm.SwitchTargetLangCommand.Execute(null);
+            ShowLanguageMenu(vm, isSource: false);
         }
         e.Handled = true;
+    }
+
+    /// <summary>
+    /// 弹出语言选择菜单
+    /// </summary>
+    private void ShowLanguageMenu(FloatingWindowViewModel vm, bool isSource)
+    {
+        var menu = new ContextMenu();
+        var currentLang = isSource ? vm.SourceLanguage : vm.TargetLanguage;
+
+        foreach (var lang in vm.Languages)
+        {
+            var item = new MenuItem
+            {
+                Header = lang,
+                IsChecked = lang == currentLang,
+                Tag = lang
+            };
+            item.Click += (_, _) =>
+            {
+                if (isSource)
+                    vm.SourceLanguage = lang;
+                else
+                    vm.TargetLanguage = lang;
+            };
+            menu.Items.Add(item);
+        }
+
+        menu.IsOpen = true;
     }
 
     private void SourceText_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)

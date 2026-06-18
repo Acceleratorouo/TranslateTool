@@ -372,13 +372,6 @@
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
 
-                    <TextBlock Grid.Column="0"
-                               Text="Ctrl+Shift+T 唤出"
-                               Foreground="{DynamicResource ClaudeTextMuted}"
-                               FontSize="11"
-                               VerticalAlignment="Center"
-                               Margin="2,0,0,0"/>
-
                     <StackPanel Grid.Column="1" Orientation="Horizontal">
                         <Button Content="🔄 对比"
                                 Style="{DynamicResource ClaudeButtonSecondary}"

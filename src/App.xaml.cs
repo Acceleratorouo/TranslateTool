@@ -21,6 +21,11 @@ public partial class App : System.Windows.Application
     private static IntPtr _floatingWindowHandle = IntPtr.Zero;
     private static bool _forceExit;
 
+    // 单实例相关
+    private static Mutex? _singleInstanceMutex;
+    private static uint _wmShowInstance;
+    private const string SingleInstanceMutexName = "TranslateTool_SingleInstance_Mutex_3F7A2E";
+
     /// <summary>
     /// 是否强制退出（托盘菜单点了退出）
     /// </summary>
@@ -28,6 +33,19 @@ public partial class App : System.Windows.Application
 
     protected override void OnStartup(StartupEventArgs e)
     {
+        // 单实例检测：如果已有实例运行，唤醒已有实例到前台后退出
+        _singleInstanceMutex = new Mutex(true, SingleInstanceMutexName, out bool createdNew);
+        if (!createdNew)
+        {
+            // 已有实例运行，唤醒它
+            WakeupExistingInstance();
+            Shutdown();
+            return;
+        }
+
+        // 注册自定义窗口消息，用于接收第二实例的唤醒信号
+        _wmShowInstance = NativeMethods.RegisterWindowMessage("TranslateTool_Wakeup_ShowInstance");
+
         // 初始化用户数据目录（首次访问时自动创建）
         UserDataPaths.Initialize();
 
@@ -63,13 +81,7 @@ public partial class App : System.Windows.Application
             LocalizationManager.Instance.SwitchLanguage(settings.UILanguage);
         }
 
-        // 首次运行引导
-        if (!settings.FirstRunCompleted)
-        {
-            var wizard = new FirstRunWizard();
-            wizard.ShowDialog();
-        }
-
+        // 预先创建主窗口（即使首次运行也先创建，避免引导窗口关闭后应用退出）
         var services = new ServiceCollection();
         services.AddSingleton<FloatingWindowViewModel>();
         services.AddSingleton<MainViewModel>();
@@ -77,40 +89,35 @@ public partial class App : System.Windows.Application
 
         _floatingWindow = new FloatingWindow
         {
-            DataContext = Services.GetRequiredService<FloatingWindowViewModel>()
+            DataContext = Services.GetRequiredService<FloatingWindowViewModel>(),
+            ShowInTaskbar = false,
+            Visibility = Visibility.Hidden
         };
+
+        // 首次运行引导
+        if (!settings.FirstRunCompleted)
+        {
+            var wizard = new FirstRunWizard
+            {
+                Owner = _floatingWindow
+            };
+            wizard.ShowDialog();
+        }
+
+        // 引导完成后显示主窗口
+        _floatingWindow.ShowInTaskbar = true;
+        _floatingWindow.Visibility = Visibility.Visible;
         _floatingWindow.Show();
+        _floatingWindow.Activate();
 
+        // 窗口显示后获取真实句柄并挂载消息钩子
         _floatingWindowHandle = new WindowInteropHelper(_floatingWindow).Handle;
-
         var hwndSource = HwndSource.FromHwnd(_floatingWindowHandle);
         hwndSource?.AddHook(WndProcHook);
 
-        RegisterHotKeyWithErrorHandling(
-            _floatingWindowHandle,
-            NativeMethods.HOTKEY_TOGGLE_WINDOW,
-            (uint)(NativeMethods.ModControl | NativeMethods.ModShift),
-            NativeMethods.VK_T,
-            "Ctrl+Shift+T（显示/隐藏悬浮窗）");
+        // 注册所有热键
+        RegisterAllHotkeys();
 
-        // 注册划词翻译热键 Ctrl+Shift+X
-        RegisterHotKeyWithErrorHandling(
-            _floatingWindowHandle,
-            NativeMethods.HOTKEY_SELECTION_TRANSLATE,
-            (uint)(NativeMethods.ModControl | NativeMethods.ModShift),
-            NativeMethods.VK_X,
-            "Ctrl+Shift+X（划词翻译）");
-
-        // 注册框选翻译热键（用户可自定义）
-        var (regionMods, regionVk) = ParseHotkey(
-            AppSettings.Current.RegionTranslateHotkeyModifiers,
-            AppSettings.Current.RegionTranslateHotkeyKey);
-        RegisterHotKeyWithErrorHandling(
-            _floatingWindowHandle,
-            NativeMethods.HOTKEY_REGION_TRANSLATE,
-            regionMods,
-            regionVk,
-            $"{AppSettings.Current.RegionTranslateHotkeyModifiers}+{AppSettings.Current.RegionTranslateHotkeyKey}（框选翻译）");
 
         // 创建托盘图标
         var iconPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "TranslateTool.ico");
@@ -119,8 +126,9 @@ public partial class App : System.Windows.Application
         {
             trayIcon = new System.Drawing.Icon(iconPath);
         }
-        catch
+        catch (Exception ex)
         {
+            System.Diagnostics.Debug.WriteLine($"托盘图标加载失败: {ex.Message}");
             trayIcon = System.Drawing.SystemIcons.Application;
         }
 
@@ -277,7 +285,10 @@ public partial class App : System.Windows.Application
         });
 
         // 快捷键提示
-        contextMenu.Items.Add(new ToolStripMenuItem($"快捷键: Ctrl+Shift+T 显示 | Ctrl+Shift+X 划词翻译 | {AppSettings.Current.RegionTranslateHotkeyModifiers}+{AppSettings.Current.RegionTranslateHotkeyKey} 框选翻译") { Enabled = false });
+        var toggleHk = string.IsNullOrEmpty(AppSettings.Current.HotkeyKey) ? "未设置" : $"{AppSettings.Current.HotkeyModifiers}+{AppSettings.Current.HotkeyKey}";
+        var selHk = string.IsNullOrEmpty(AppSettings.Current.SelectionTranslateHotkeyKey) ? "未设置" : $"{AppSettings.Current.SelectionTranslateHotkeyModifiers}+{AppSettings.Current.SelectionTranslateHotkeyKey}";
+        var regionHk = string.IsNullOrEmpty(AppSettings.Current.RegionTranslateHotkeyKey) ? "未设置" : $"{AppSettings.Current.RegionTranslateHotkeyModifiers}+{AppSettings.Current.RegionTranslateHotkeyKey}";
+        contextMenu.Items.Add(new ToolStripMenuItem($"快捷键: {toggleHk} 显示 | {selHk} 划词翻译 | {regionHk} 框选翻译") { Enabled = false });
 
         contextMenu.Items.Add(new ToolStripSeparator());
 
@@ -305,6 +316,14 @@ public partial class App : System.Windows.Application
         IntPtr lParam,
         ref bool handled)
     {
+        // 处理第二实例发来的唤醒消息
+        if (_wmShowInstance != 0 && msg == _wmShowInstance)
+        {
+            ShowFloatingWindow();
+            handled = true;
+            return IntPtr.Zero;
+        }
+
         const int WM_HOTKEY = 0x0312;
 
         if (msg == WM_HOTKEY)
@@ -349,7 +368,48 @@ public partial class App : System.Windows.Application
         TranslationCache.Save();
 
         _notifyIcon?.Dispose();
+
+        // 释放单实例锁
+        try
+        {
+            _singleInstanceMutex?.ReleaseMutex();
+            _singleInstanceMutex?.Dispose();
+        }
+        catch { }
+
         base.OnExit(e);
+    }
+
+    /// <summary>
+    /// 唤醒已有实例：向其主窗口发送自定义消息，使其显示到前台
+    /// </summary>
+    private static void WakeupExistingInstance()
+    {
+        // 通过窗口标题查找已有实例的主窗口
+        var hwnd = NativeMethods.FindWindow(null, "翻译工具");
+        if (hwnd != IntPtr.Zero)
+        {
+            // 如果窗口最小化了，先恢复
+            if (NativeMethods.IsIconic(hwnd))
+            {
+                NativeMethods.ShowWindow(hwnd, NativeMethods.SW_RESTORE);
+            }
+            else
+            {
+                NativeMethods.ShowWindow(hwnd, NativeMethods.SW_SHOW);
+            }
+            NativeMethods.SetForegroundWindow(hwnd);
+
+            // 同时发送自定义消息，触发 ShowFloatingWindow 逻辑
+            if (_wmShowInstance == 0)
+            {
+                _wmShowInstance = NativeMethods.RegisterWindowMessage("TranslateTool_Wakeup_ShowInstance");
+            }
+            if (_wmShowInstance != 0)
+            {
+                NativeMethods.SendMessage(hwnd, _wmShowInstance, IntPtr.Zero, IntPtr.Zero);
+            }
+        }
     }
 
     private static void RegisterHotKeyWithErrorHandling(
@@ -366,7 +426,7 @@ public partial class App : System.Windows.Application
 
         var errorCode = (uint)Marshal.GetLastWin32Error();
         var errorMessage = NativeMethods.GetHotKeyErrorMessage(errorCode);
-        var fullMessage = $"{hotkeyDisplayName}注册失败：{errorMessage}\n\n请在设置中更换热键后重启应用。";
+        var fullMessage = $"{hotkeyDisplayName}注册失败：{errorMessage}\n\n请在设置中更换热键。";
 
         System.Diagnostics.Debug.WriteLine(
             $"RegisterHotKey failed for {hotkeyDisplayName}. Error code: {errorCode}");
@@ -379,7 +439,64 @@ public partial class App : System.Windows.Application
     }
 
     /// <summary>
+    /// 重新注册所有热键（先注销旧的，再注册新的）。
+    /// 供设置页面在用户修改快捷键后立即调用，无需重启应用。
+    /// </summary>
+    public static void RegisterAllHotkeys()
+    {
+        if (_floatingWindowHandle == IntPtr.Zero) return;
+
+        // 先注销所有热键
+        NativeMethods.UnregisterHotKey(_floatingWindowHandle, NativeMethods.HOTKEY_TOGGLE_WINDOW);
+        NativeMethods.UnregisterHotKey(_floatingWindowHandle, NativeMethods.HOTKEY_SELECTION_TRANSLATE);
+        NativeMethods.UnregisterHotKey(_floatingWindowHandle, NativeMethods.HOTKEY_REGION_TRANSLATE);
+
+        // 注册显示/隐藏悬浮窗热键
+        if (!string.IsNullOrEmpty(AppSettings.Current.HotkeyKey))
+        {
+            var (toggleMods, toggleVk) = ParseHotkey(
+                AppSettings.Current.HotkeyModifiers,
+                AppSettings.Current.HotkeyKey);
+            RegisterHotKeyWithErrorHandling(
+                _floatingWindowHandle,
+                NativeMethods.HOTKEY_TOGGLE_WINDOW,
+                toggleMods,
+                toggleVk,
+                $"{AppSettings.Current.HotkeyModifiers}+{AppSettings.Current.HotkeyKey}（显示/隐藏悬浮窗）");
+        }
+
+        // 注册划词翻译热键
+        if (!string.IsNullOrEmpty(AppSettings.Current.SelectionTranslateHotkeyKey))
+        {
+            var (selMods, selVk) = ParseHotkey(
+                AppSettings.Current.SelectionTranslateHotkeyModifiers,
+                AppSettings.Current.SelectionTranslateHotkeyKey);
+            RegisterHotKeyWithErrorHandling(
+                _floatingWindowHandle,
+                NativeMethods.HOTKEY_SELECTION_TRANSLATE,
+                selMods,
+                selVk,
+                $"{AppSettings.Current.SelectionTranslateHotkeyModifiers}+{AppSettings.Current.SelectionTranslateHotkeyKey}（划词翻译）");
+        }
+
+        // 注册框选翻译热键
+        if (!string.IsNullOrEmpty(AppSettings.Current.RegionTranslateHotkeyKey))
+        {
+            var (regionMods, regionVk) = ParseHotkey(
+                AppSettings.Current.RegionTranslateHotkeyModifiers,
+                AppSettings.Current.RegionTranslateHotkeyKey);
+            RegisterHotKeyWithErrorHandling(
+                _floatingWindowHandle,
+                NativeMethods.HOTKEY_REGION_TRANSLATE,
+                regionMods,
+                regionVk,
+                $"{AppSettings.Current.RegionTranslateHotkeyModifiers}+{AppSettings.Current.RegionTranslateHotkeyKey}（框选翻译）");
+        }
+    }
+
+    /// <summary>
     /// 将快捷键字符串配置解析为 RegisterHotKey 所需的修饰符和虚拟键码。
+    /// 支持录制器输出的所有按键格式。
     /// </summary>
     private static (uint modifiers, uint vk) ParseHotkey(string modifiersStr, string keyStr)
     {
@@ -388,15 +505,34 @@ public partial class App : System.Windows.Application
             mods |= NativeMethods.ModControl;
         if (modifiersStr.Contains("Shift", StringComparison.OrdinalIgnoreCase))
             mods |= NativeMethods.ModShift;
+        if (modifiersStr.Contains("Alt", StringComparison.OrdinalIgnoreCase))
+            mods |= NativeMethods.ModAlt;
+        if (modifiersStr.Contains("Win", StringComparison.OrdinalIgnoreCase))
+            mods |= NativeMethods.ModWin;
 
-        // 解析按键：A-Z 映射为 0x41-0x5A
-        uint vk = keyStr.ToUpperInvariant() switch
+        var key = (keyStr ?? "").Trim();
+        uint vk = key.ToUpperInvariant() switch
         {
-            "T" => NativeMethods.VK_T,
-            "X" => NativeMethods.VK_X,
-            "R" => NativeMethods.VK_R,
+            // A-Z → 0x41-0x5A
             var c when c.Length == 1 && c[0] >= 'A' && c[0] <= 'Z' => (uint)(c[0] - 'A' + 0x41),
-            _ => NativeMethods.VK_R
+            // 0-9 → 0x30-0x39
+            var c when c.Length == 1 && c[0] >= '0' && c[0] <= '9' => (uint)(c[0] - '0' + 0x30),
+            // F1-F24 → 0x70-0x87
+            var f when f.StartsWith('F') && int.TryParse(f[1..], out int fn) && fn >= 1 && fn <= 24 => (uint)(0x70 + fn - 1),
+            // 符号键
+            "SPACE" => 0x20,
+            "`" => 0xC0,
+            "-" => 0xBD,
+            "=" => 0xBB,
+            "[" => 0xDB,
+            "]" => 0xDD,
+            "\\" => 0xDC,
+            ";" => 0xBA,
+            "'" => 0xDE,
+            "," => 0xBC,
+            "." => 0xBE,
+            "/" => 0xBF,
+            _ => NativeMethods.VK_T // 默认回退到 T
         };
 
         return (mods, vk);
