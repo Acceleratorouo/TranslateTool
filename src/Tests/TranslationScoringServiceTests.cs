@@ -221,8 +221,8 @@ public class TranslationScoringServiceTests
     [Fact]
     public void ScoreResult_FutureYear_Penalized()
     {
-        var source = "The event was in 2025";
-        var translation = "该活动是在2025年。";
+        var source = "The event was in 2030";
+        var translation = "该活动是在2030年。";
         var allTranslations = new List<string> { translation };
 
         var result = TranslationScoringService.ScoreResult(source, translation, allTranslations);

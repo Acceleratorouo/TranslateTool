@@ -168,10 +168,15 @@ public static class TranslationScoringService
             int targetWords = translated.Split(new[] { ' ', '\t', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries).Length;
             ratio = sourceWords > 0 ? (double)targetWords / sourceWords : 1.0;
         }
+        else if (isCjkTarget)
+        {
+            // 英文 -> CJK：CJK 字符数通常约为源英文长度的 0.5~0.7 倍，乘以系数 1.8 归一化到理想区间
+            ratio = (double)translated.Length / source.Length * 1.8;
+        }
         else
         {
-            // 混合翻译：按字符/单词混合估算
-            ratio = (double)translated.Length / (source.Length * 1.5);
+            // CJK -> 英文：英文长度通常约为 CJK 的 1.5~2 倍
+            ratio = (double)translated.Length / source.Length / 1.5;
         }
 
         // 0.6 - 1.5 是理想范围
@@ -230,7 +235,7 @@ public static class TranslationScoringService
         // 相似度 0.5-0.7：正常
         // 相似度 0.3 以下：可能有问题
         double score;
-        if (avgSimilarity >= 0.85)
+        if (avgSimilarity >= 0.75)
         {
             score = 60; // 太高相似，可能都不好
             reasons.Add("与其他结果高度相似");

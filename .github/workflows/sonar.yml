@@ -47,7 +47,7 @@ jobs:
             /o:"acceleratorouo" `
             /d:sonar.token="$env:SONAR_TOKEN" `
             /d:sonar.host.url="https://sonarcloud.io" `
-            /d:sonar.cs.opencover.reportPaths="src/Tests/coverage.opencover.xml" `
+            /d:sonar.cs.opencover.reportPaths="TestResults/**/coverage.opencover.xml" `
             /d:sonar.cs.vstest.reportsPaths="**/TestResults/*.trx"
 
       - name: Build
