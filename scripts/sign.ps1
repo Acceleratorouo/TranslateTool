@@ -113,7 +113,7 @@ Write-Host "准备签名 $($targets.Count) 个文件..."
 $failed = @()
 foreach ($file in $targets) {
     Write-Host "  → $($file.FullName)" -NoNewline
-    $args = @(
+    $signArgs = @(
         "sign"
         "/fd", "SHA256"           # 签名算法
         "/a"                      # 自动选证书
@@ -125,7 +125,7 @@ foreach ($file in $targets) {
     )
     $psi = New-Object System.Diagnostics.ProcessStartInfo
     $psi.FileName = $SignToolPath
-    $psi.Arguments = ($args -join " ")
+    $psi.Arguments = ($signArgs -join " ")
     $psi.RedirectStandardOutput = $true
     $psi.RedirectStandardError  = $true
     $psi.UseShellExecute        = $false
