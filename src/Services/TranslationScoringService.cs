@@ -17,6 +17,11 @@ public static class TranslationScoringService
     private const double DefaultRejectionWeight = 0.10;
 
     /// <summary>
+    /// 浮点数比较容差
+    /// </summary>
+    private const double Epsilon = 1e-6;
+
+    /// <summary>
     /// 为翻译结果打分（0-100）
     /// </summary>
     /// <param name="sourceText">源文本</param>
@@ -289,7 +294,7 @@ public static class TranslationScoringService
         }
 
         // 无异常问题
-        if (score == 100)
+        if (Math.Abs(score - 100) < Epsilon)
         {
             reasons.Add("格式规范 ✓");
         }
@@ -329,7 +334,7 @@ public static class TranslationScoringService
             reasons.Add("可能为机械拼接");
         }
 
-        if (score == 100)
+        if (Math.Abs(score - 100) < Epsilon)
         {
             reasons.Add("表达自然 ✓");
         }
