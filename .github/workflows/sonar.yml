@@ -77,7 +77,7 @@ jobs:
         run: |
           # 如未通过 quality gate，PR 检查会失败
           $response = Invoke-RestMethod `
-            -Uri "https://sonarcloud.io/api/qualitygate/project_status?projectKey=TranslateTool_TranslateTool" `
+            -Uri "https://sonarcloud.io/api/qualitygates/project_status?projectKey=Acceleratorouo_TranslateTool" `
             -Headers @{ Authorization = "Bearer $env:SONAR_TOKEN" }
           if ($response.projectStatus.status -ne "OK") {
             Write-Error "Quality Gate 未通过: $($response.projectStatus.status)"
