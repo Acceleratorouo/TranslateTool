@@ -43,8 +43,8 @@ jobs:
         shell: pwsh
         run: |
           dotnet sonarscanner begin `
-            /k:"TranslateTool_TranslateTool" `
-            /o:"TranslateTool" `
+            /k:"Acceleratorouo_TranslateTool" `
+            /o:"acceleratorouo" `
             /d:sonar.token="$env:SONAR_TOKEN" `
             /d:sonar.host.url="https://sonarcloud.io" `
             /d:sonar.cs.opencover.reportPaths="src/Tests/coverage.opencover.xml" `
