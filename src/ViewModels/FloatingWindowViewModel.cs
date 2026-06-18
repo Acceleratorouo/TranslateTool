@@ -613,12 +613,17 @@ public partial class FloatingWindowViewModel : ObservableObject
 
     private void LoadHistory()
     {
+        _ = LoadHistoryAsync();
+    }
+
+    private async Task LoadHistoryAsync()
+    {
         try
         {
             UserDataPaths.EnsureDirectoryExists(UserDataPaths.HistoryDirectory);
             if (File.Exists(HistoryFilePath))
             {
-                var json = File.ReadAllText(HistoryFilePath);
+                var json = await File.ReadAllTextAsync(HistoryFilePath);
                 var entries = JsonSerializer.Deserialize<List<HistoryEntry>>(json);
                 if (entries != null)
                 {
@@ -632,6 +637,11 @@ public partial class FloatingWindowViewModel : ObservableObject
 
     private void SaveHistory()
     {
+        _ = SaveHistoryAsync();
+    }
+
+    private async Task SaveHistoryAsync()
+    {
         try
         {
             UserDataPaths.EnsureDirectoryExists(UserDataPaths.HistoryDirectory);
@@ -639,7 +649,7 @@ public partial class FloatingWindowViewModel : ObservableObject
             {
                 WriteIndented = true
             });
-            File.WriteAllText(HistoryFilePath, json);
+            await File.WriteAllTextAsync(HistoryFilePath, json);
         }
         catch { }
     }
