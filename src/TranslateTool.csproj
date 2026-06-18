@@ -10,9 +10,9 @@
     <ApplicationIcon>Resources\TranslateTool.ico</ApplicationIcon>
     <AssemblyName>TranslateTool</AssemblyName>
     <RootNamespace>TranslateTool</RootNamespace>
-    <Version>1.1.0</Version>
-    <AssemblyVersion>1.1.0.0</AssemblyVersion>
-    <FileVersion>1.1.0.0</FileVersion>
+    <Version>1.1.1</Version>
+    <AssemblyVersion>1.1.1.0</AssemblyVersion>
+    <FileVersion>1.1.1.0</FileVersion>
     <Authors>TranslateTool</Authors>
     <Description>自动翻译桌面工具 - 支持百度、Google、微软、DeepL 多引擎翻译</Description>
     <PackageId>TranslateTool</PackageId>
