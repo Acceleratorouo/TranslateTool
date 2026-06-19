@@ -3,7 +3,6 @@ using System.IO;
 using System.Text.Json;
 using System.Windows;
 using System.Windows.Input;
-using System.Windows.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 // OpenFileDialog
@@ -36,9 +35,14 @@ public partial class FloatingWindowViewModel : ObservableObject
     private static readonly string HistoryFilePath = UserDataPaths.HistoryFile;
 
     // 剪贴板监听
-    private DispatcherTimer? _clipboardTimer;
     private string _lastClipboardText = "";
     private bool _isAutoTranslateEnabled = true;
+    private readonly IClipboardService _clipboardService;
+    private readonly IFilePickerService _filePickerService;
+    private readonly IRegionSelectionService _regionSelectionService;
+    private readonly ITextToSpeechService _textToSpeechService;
+    private readonly INotificationService _notificationService;
+    private readonly ITimerService? _timerService;
 
     // 划词翻译防抖
     private DateTime _lastSelectionTranslateTime = DateTime.MinValue;
@@ -132,7 +136,26 @@ public partial class FloatingWindowViewModel : ObservableObject
     public IRelayCommand<string> VoteResultCommand { get; }
 
     public FloatingWindowViewModel()
+        : this(new WpfClipboardService(), new WpfFilePickerService(), new WpfRegionSelectionService(), new WpfTextToSpeechService(), new WpfNotificationService(), new WpfTimerService())
     {
+    }
+
+    public FloatingWindowViewModel(
+        IClipboardService clipboardService,
+        IFilePickerService? filePickerService = null,
+        IRegionSelectionService? regionSelectionService = null,
+        ITextToSpeechService? textToSpeechService = null,
+        INotificationService? notificationService = null,
+        ITimerService? timerService = null,
+        bool startClipboardMonitor = true)
+    {
+        _clipboardService = clipboardService;
+        _filePickerService = filePickerService ?? new WpfFilePickerService();
+        _regionSelectionService = regionSelectionService ?? new WpfRegionSelectionService();
+        _textToSpeechService = textToSpeechService ?? new WpfTextToSpeechService();
+        _notificationService = notificationService ?? new WpfNotificationService();
+        _timerService = timerService;
+
         PasteTranslateCommand = new RelayCommand(ExecutePasteTranslate);
         FileTranslateCommand = new AsyncRelayCommand<string>(ExecuteFileTranslate);
         TranslateFileCommand = new AsyncRelayCommand<string>(ExecuteTranslateFile);
@@ -151,24 +174,25 @@ public partial class FloatingWindowViewModel : ObservableObject
         VoteResultCommand = new RelayCommand<string>(ExecuteVoteResult);
 
         LoadHistory();
-        StartClipboardMonitor();
+        if (startClipboardMonitor)
+        {
+            StartClipboardMonitor();
+        }
 
-        // 从设置加载语言偏好
         _sourceLanguage = MapCodeToLanguage(Settings.SourceLanguage);
         _targetLanguage = MapCodeToLanguage(Settings.TargetLanguage);
     }
 
-    /// <summary>
-    /// 启动剪贴板监听，复制文本自动翻译
-    /// </summary>
     private void StartClipboardMonitor()
     {
-        _clipboardTimer = new DispatcherTimer
+        if (_timerService is null)
         {
-            Interval = TimeSpan.FromMilliseconds(500)
-        };
-        _clipboardTimer.Tick += ClipboardTimer_Tick;
-        _clipboardTimer.Start();
+            return;
+        }
+
+        _timerService.Interval = TimeSpan.FromMilliseconds(500);
+        _timerService.Tick += ClipboardTimer_Tick;
+        _timerService.Start();
     }
 
     private void ClipboardTimer_Tick(object? sender, EventArgs e)
@@ -177,11 +201,9 @@ public partial class FloatingWindowViewModel : ObservableObject
 
         try
         {
-            var currentText = ClipboardHelper.GetClipboardText();
+            var currentText = _clipboardService.GetText();
             if (string.IsNullOrWhiteSpace(currentText)) return;
             if (currentText == _lastClipboardText) return;
-
-            // 过滤掉过短的文本（避免误触）和过长的文本
             if (currentText.Length < 2 || currentText.Length > 5000) return;
 
             _lastClipboardText = currentText;
@@ -189,17 +211,12 @@ public partial class FloatingWindowViewModel : ObservableObject
         }
         catch
         {
-            // 剪贴板可能被其他程序锁定，忽略
         }
     }
 
-    /// <summary>
-    /// 释放资源
-    /// </summary>
     public void Cleanup()
     {
-        _clipboardTimer?.Stop();
-        _clipboardTimer = null;
+        _timerService?.Stop();
     }
 
     partial void OnSourceLanguageChanged(string value)
@@ -276,24 +293,20 @@ public partial class FloatingWindowViewModel : ObservableObject
 
     private void ExecutePasteTranslate()
     {
-        var text = ClipboardHelper.GetClipboardText();
+        var text = _clipboardService.GetText();
         if (string.IsNullOrWhiteSpace(text))
         {
-            ResultText = "剪贴板为空";
+            ResultText = Localization["ErrorClipboardEmpty"];
             return;
         }
 
         _ = DoTranslate(text);
     }
 
-    /// <summary>
-    /// 划词翻译 - 通过模拟 Ctrl+C 获取选中文本
-    /// </summary>
     public void SelectionTranslate()
     {
         if (!Settings.EnableSelectionTranslate) return;
 
-        // 防抖：忽略 500ms 内的重复触发
         var now = DateTime.Now;
         if ((now - _lastSelectionTranslateTime).TotalMilliseconds < SelectionTranslateDebounceMs)
         {
@@ -301,14 +314,12 @@ public partial class FloatingWindowViewModel : ObservableObject
         }
         _lastSelectionTranslateTime = now;
 
-        // 检查前台窗口是否是 TranslateTool 自己，跳过
         if (IsTranslateToolInForeground())
         {
             return;
         }
 
-        // 备份当前剪贴板内容
-        var previousClipboard = ClipboardHelper.GetClipboardText();
+        var previousClipboard = _clipboardService.GetText();
         string? previousClipboardData = null;
         if (!string.IsNullOrEmpty(previousClipboard))
         {
@@ -317,28 +328,21 @@ public partial class FloatingWindowViewModel : ObservableObject
 
         try
         {
-            // 模拟 Ctrl+C 复制选中文本
             System.Windows.Forms.SendKeys.SendWait("^c");
-            // 等待剪贴板更新
             System.Threading.Thread.Sleep(100);
 
-            // 读取剪贴板内容
-            var selectedText = ClipboardHelper.GetClipboardText();
+            var selectedText = _clipboardService.GetText();
 
-            // 恢复原剪贴板内容
             if (previousClipboardData != null)
             {
-                ClipboardHelper.SetClipboardText(previousClipboardData);
+                _clipboardService.SetText(previousClipboardData);
             }
 
-            // 检查是否获取到有效文本
             if (string.IsNullOrWhiteSpace(selectedText) || selectedText == previousClipboardData)
             {
-                // 没有选中文本或选中文本与之前剪贴板相同
                 return;
             }
 
-            // 过滤过短或过长的文本
             if (selectedText.Length < 2 || selectedText.Length > 5000)
             {
                 return;
@@ -348,21 +352,17 @@ public partial class FloatingWindowViewModel : ObservableObject
         }
         catch
         {
-            // 确保剪贴板被恢复
             if (previousClipboardData != null)
             {
                 try
                 {
-                    ClipboardHelper.SetClipboardText(previousClipboardData);
+                    _clipboardService.SetText(previousClipboardData);
                 }
                 catch { }
             }
         }
     }
 
-    /// <summary>
-    /// 检查前台窗口是否是翻译工具本身
-    /// </summary>
     private static bool IsTranslateToolInForeground()
     {
         try
@@ -370,21 +370,16 @@ public partial class FloatingWindowViewModel : ObservableObject
             var foregroundWindow = NativeMethods.GetForegroundWindow();
             if (foregroundWindow == IntPtr.Zero) return false;
 
-            // 获取前台窗口标题
             var sb = new System.Text.StringBuilder(256);
             NativeMethods.GetWindowText(foregroundWindow, sb, 256);
             var windowTitle = sb.ToString();
 
-            // 检查是否是 TranslateTool 的窗口
             if (windowTitle.Contains("TranslateTool") || windowTitle.Contains("翻译工具"))
             {
                 return true;
             }
 
-            // 获取前台窗口进程 ID
             NativeMethods.GetWindowThreadProcessId(foregroundWindow, out uint foregroundPid);
-
-            // 获取当前进程 ID
             var currentProcess = System.Diagnostics.Process.GetCurrentProcess();
             return foregroundPid == currentProcess.Id;
         }
@@ -396,15 +391,10 @@ public partial class FloatingWindowViewModel : ObservableObject
 
     private async Task ExecuteFileTranslate(string? _)
     {
-        var dialog = new Microsoft.Win32.OpenFileDialog
+        var filePath = _filePickerService.PickFileForTranslation();
+        if (!string.IsNullOrWhiteSpace(filePath))
         {
-            Filter = "支持的文件|*.txt;*.docx;*.pdf|文本文件|*.txt|Word 文档|*.docx|PDF 文件|*.pdf",
-            Title = "选择要翻译的文件"
-        };
-
-        if (dialog.ShowDialog() == true)
-        {
-            await ExecuteTranslateFile(dialog.FileName);
+            await ExecuteTranslateFile(filePath);
         }
     }
 
@@ -412,7 +402,7 @@ public partial class FloatingWindowViewModel : ObservableObject
     {
         if (string.IsNullOrWhiteSpace(filePath) || !File.Exists(filePath))
         {
-            ResultText = "文件不存在或路径无效";
+            ResultText = Localization["ErrorFileNotFound"];
             return;
         }
 
@@ -422,16 +412,22 @@ public partial class FloatingWindowViewModel : ObservableObject
             var text = await Task.Run(() => FileTranslationService.ExtractText(filePath));
             if (string.IsNullOrWhiteSpace(text))
             {
-                ResultText = "文件内容为空或无法提取文本";
+                ResultText = Localization["ErrorFileEmpty"];
                 return;
             }
 
-            ResultText = $"正在翻译文件: {Path.GetFileName(filePath)}...";
+            ResultText = string.Format(
+                System.Globalization.CultureInfo.CurrentCulture,
+                Localization["TranslatingFile"],
+                Path.GetFileName(filePath));
             await DoTranslate(text);
         }
         catch (Exception ex)
         {
-            ResultText = $"文件翻译出错: {ex.Message}";
+            ResultText = string.Format(
+                System.Globalization.CultureInfo.CurrentCulture,
+                Localization["ErrorFileTranslate"],
+                ex.Message);
         }
         finally
         {
@@ -444,29 +440,22 @@ public partial class FloatingWindowViewModel : ObservableObject
         IsBusy = true;
         try
         {
-            // 显示区域选择遮罩
-            var overlay = new Views.RegionSelectorOverlay();
-            overlay.ShowDialog();
-
-            if (!overlay.IsCompleted || overlay.SelectedRegion == null)
+            var selectedRegion = _regionSelectionService.SelectRegion();
+            if (selectedRegion == null)
             {
                 IsBusy = false;
                 return;
             }
 
-            var region = overlay.SelectedRegion.Value;
-
-            // 显示 OCR 下载进度
+            var region = selectedRegion.Value;
             var progress = new Progress<string>(msg => ResultText = msg);
-            
-            // 确保 OCR 就绪（自动下载语言包）
+
             if (!OcrService.IsReady)
             {
-                ResultText = "正在准备 OCR 引擎...";
+                ResultText = Localization["PreparingOcr"];
                 await OcrService.InitializeAsync(progress);
             }
 
-            // 截取选中区域
             var rect = new System.Drawing.Rectangle(
                 (int)region.X,
                 (int)region.Y,
@@ -474,20 +463,22 @@ public partial class FloatingWindowViewModel : ObservableObject
                 (int)region.Height);
 
             using var bitmap = ScreenCaptureService.CaptureRectangle(rect);
-            ResultText = "正在识别文字...";
+            ResultText = Localization["RecognizingText"];
             var text = await OcrService.RecognizeTextAsync(bitmap, progress: progress);
             await DoTranslate(text);
         }
         catch (Exception ex)
         {
-            ResultText = $"框选翻译出错: {ex.Message}";
+            ResultText = string.Format(
+                System.Globalization.CultureInfo.CurrentCulture,
+                Localization["ErrorRegion"],
+                ex.Message);
         }
         finally
         {
             IsBusy = false;
         }
     }
-
     private async Task DoTranslate(string text)
     {
         _lastFullSourceText = text;
@@ -506,7 +497,7 @@ public partial class FloatingWindowViewModel : ObservableObject
                 // 自动复制译文到剪贴板
                 if (Settings.AutoCopyTranslation)
                 {
-                    try { ClipboardHelper.SetClipboardText(cachedText!); } catch { }
+                    try { _clipboardService.SetText(cachedText!); } catch { }
                 }
 
                 AddToHistory(text, cachedText!, Settings.TranslationEngine + " (缓存)");
@@ -544,7 +535,7 @@ public partial class FloatingWindowViewModel : ObservableObject
                 {
                     try
                     {
-                        ClipboardHelper.SetClipboardText(result.TranslatedText);
+                        _clipboardService.SetText(result.TranslatedText);
                     }
                     catch { }
                 }
@@ -580,13 +571,7 @@ public partial class FloatingWindowViewModel : ObservableObject
             // 翻译完成后，若悬浮窗未显示且开启了 Toast 提示，则显示 Toast
             if (!IsWindowVisible && Settings.ShowToastOnTranslate && !string.IsNullOrEmpty(_translatedResultText))
             {
-                var sourceToShow = _translatedSourceText;
-                var resultToShow = _translatedResultText;
-                var engineToShow = _translatedEngineName;
-                System.Windows.Application.Current.Dispatcher.Invoke(() =>
-                {
-                    TranslationToastWindow.Show(sourceToShow, resultToShow, engineToShow);
-                });
+                _notificationService.ShowTranslation(_translatedSourceText, _translatedResultText, _translatedEngineName);
             }
         }
     }
@@ -708,7 +693,7 @@ public partial class FloatingWindowViewModel : ObservableObject
                     textToCopy = ResultText[(transStart + marker.Length)..];
                 }
             }
-            ClipboardHelper.SetClipboardText(textToCopy);
+            _clipboardService.SetText(textToCopy);
         }
     }
 
@@ -735,31 +720,11 @@ public partial class FloatingWindowViewModel : ObservableObject
     }
 
     /// <summary>
-    /// 使用 Windows SAPI 朗读文本
+    /// 使用文本转语音服务朗读文本。
     /// </summary>
     private void SpeakText(string text)
     {
-        try
-        {
-            // 异步朗读，不阻塞 UI
-            Task.Run(() =>
-            {
-                try
-                {
-                    using var synthesizer = new System.Speech.Synthesis.SpeechSynthesizer();
-                    synthesizer.SetOutputToDefaultAudioDevice();
-                    synthesizer.Speak(text); // 使用同步方法确保音频播放完成
-                }
-                catch (Exception ex)
-                {
-                    System.Diagnostics.Debug.WriteLine($"Speech failed: {ex.Message}");
-                }
-            });
-        }
-        catch (Exception ex)
-        {
-            System.Diagnostics.Debug.WriteLine($"Speech initialization failed: {ex.Message}");
-        }
+        _textToSpeechService.Speak(text);
     }
 
     /// <summary>

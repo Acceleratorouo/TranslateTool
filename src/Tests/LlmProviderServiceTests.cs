@@ -72,4 +72,32 @@ public class LlmProviderServiceTests
 
         Assert.Equal("p2", result?.Id);
     }
+
+    [Fact]
+    public void DeleteProvider_ClearsDefaultProviderId_WhenDeletingDefault()
+    {
+        var provider = new LlmProvider { Id = "p1", DisplayName = "P1", IsDefault = true };
+        LlmProviderService.Providers.Add(provider);
+        LlmProviderService.Settings.DefaultProviderId = provider.Id;
+
+        LlmProviderService.DeleteProvider(provider);
+
+        Assert.Empty(LlmProviderService.Providers);
+        Assert.Null(LlmProviderService.Settings.DefaultProviderId);
+    }
+
+    [Fact]
+    public void DeleteProvider_KeepsDefaultProviderId_WhenDeletingNonDefault()
+    {
+        var defaultProvider = new LlmProvider { Id = "default", DisplayName = "Default", IsDefault = true };
+        var otherProvider = new LlmProvider { Id = "other", DisplayName = "Other" };
+        LlmProviderService.Providers.Add(defaultProvider);
+        LlmProviderService.Providers.Add(otherProvider);
+        LlmProviderService.Settings.DefaultProviderId = defaultProvider.Id;
+
+        LlmProviderService.DeleteProvider(otherProvider);
+
+        Assert.Single(LlmProviderService.Providers);
+        Assert.Equal(defaultProvider.Id, LlmProviderService.Settings.DefaultProviderId);
+    }
 }

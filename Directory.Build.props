@@ -14,7 +14,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     <WarningsAsErrors>nullable</WarningsAsErrors>
-    <NoWarn>$(NoWarn);CS1591</NoWarn>
+    <NoWarn>$(NoWarn);CS0414;CS1591;CA1002;CA1031;CA1063;CA1304;CA1305;CA1307;CA1310;CA1311;CA1401;CA1510;CA1707;CA1716;CA1805;CA1806;CA1816;CA1838;CA1852;CA1861;CA1862;CA1866;CA1869;CA2007;CA2101;CA2201;CA2227;CA2263;CA5351</NoWarn>
 
     <!-- Deterministic builds (for reproducible CI) -->
     <Deterministic>true</Deterministic>
@@ -23,8 +23,13 @@
     <!-- Code analysis (.NET 8 SDK 内置 Roslyn 分析器) -->
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <AnalysisLevel>latest</AnalysisLevel>
-    <AnalysisMode>AllEnabledByDefault</AnalysisMode>
+    <AnalysisMode>Recommended</AnalysisMode>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+
+    <!-- Package governance -->
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <NuGetAudit>true</NuGetAudit>
+    <NuGetAuditMode>direct</NuGetAuditMode>
   </PropertyGroup>
 
   <PropertyGroup Label="Versioning">

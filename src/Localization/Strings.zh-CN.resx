@@ -47,9 +47,6 @@
   <data name="CopyAutoTranslate" xml:space="preserve">
     <value>复制文本自动翻译</value>
   </data>
-  <data name="HotkeyHint" xml:space="preserve">
-    <value>Ctrl+Shift+T 唤出</value>
-  </data>
   <data name="CopyTranslated" xml:space="preserve">
     <value>复制译文</value>
   </data>
@@ -102,14 +99,8 @@
   <data name="MenuFileTranslate" xml:space="preserve">
     <value>文件翻译</value>
   </data>
-  <data name="MenuFullScreenTranslate" xml:space="preserve">
-    <value>全屏自动翻译</value>
-  </data>
   <data name="MenuRegionTranslate" xml:space="preserve">
     <value>截图框选翻译</value>
-  </data>
-  <data name="MenuHistory" xml:space="preserve">
-    <value>翻译历史</value>
   </data>
   <data name="MenuEngine" xml:space="preserve">
     <value>翻译引擎</value>
@@ -201,11 +192,14 @@
   <data name="ErrorFileTranslate" xml:space="preserve">
     <value>文件翻译出错: {0}</value>
   </data>
-  <data name="ErrorFullScreen" xml:space="preserve">
-    <value>全屏翻译出错: {0}</value>
-  </data>
   <data name="ErrorRegion" xml:space="preserve">
     <value>框选翻译出错: {0}</value>
+  </data>
+  <data name="PreparingOcr" xml:space="preserve">
+    <value>正在准备 OCR 引擎...</value>
+  </data>
+  <data name="RecognizingText" xml:space="preserve">
+    <value>正在识别文字...</value>
   </data>
   <data name="ErrorEngine" xml:space="preserve">
     <value>引擎错误: {0}</value>

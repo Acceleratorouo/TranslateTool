@@ -27,3 +27,10 @@ public static class ClipboardHelper
         catch { /* Ignore clipboard errors */ }
     }
 }
+
+public sealed class WpfClipboardService : IClipboardService
+{
+    public string GetText() => ClipboardHelper.GetClipboardText();
+
+    public void SetText(string text) => ClipboardHelper.SetClipboardText(text);
+}

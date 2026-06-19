@@ -89,6 +89,7 @@ public class AppSettings
                 });
                 if (settings != null)
                 {
+                    SensitiveSettingsProtector.UnprotectLoadedSettings(settings);
                     Current = settings;
                 }
             }
@@ -108,7 +109,8 @@ public class AppSettings
         try
         {
             UserDataPaths.EnsureDirectoryExists(UserDataPaths.RoamingAppDataDirectory);
-            var json = JsonSerializer.Serialize(this, new JsonSerializerOptions
+            var settingsForStorage = SensitiveSettingsProtector.ProtectForStorage(this);
+            var json = JsonSerializer.Serialize(settingsForStorage, new JsonSerializerOptions
             {
                 WriteIndented = true
             });

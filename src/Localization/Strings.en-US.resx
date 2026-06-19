@@ -47,9 +47,6 @@
   <data name="CopyAutoTranslate" xml:space="preserve">
     <value>Copy text to auto-translate</value>
   </data>
-  <data name="HotkeyHint" xml:space="preserve">
-    <value>Ctrl+Shift+T to show</value>
-  </data>
   <data name="CopyTranslated" xml:space="preserve">
     <value>Copy Translation</value>
   </data>
@@ -102,14 +99,8 @@
   <data name="MenuFileTranslate" xml:space="preserve">
     <value>File Translate</value>
   </data>
-  <data name="MenuFullScreenTranslate" xml:space="preserve">
-    <value>Full Screen Translate</value>
-  </data>
   <data name="MenuRegionTranslate" xml:space="preserve">
     <value>Region Translate</value>
-  </data>
-  <data name="MenuHistory" xml:space="preserve">
-    <value>History</value>
   </data>
   <data name="MenuEngine" xml:space="preserve">
     <value>Translation Engine</value>
@@ -201,11 +192,14 @@
   <data name="ErrorFileTranslate" xml:space="preserve">
     <value>File translation error: {0}</value>
   </data>
-  <data name="ErrorFullScreen" xml:space="preserve">
-    <value>Full screen translation error: {0}</value>
-  </data>
   <data name="ErrorRegion" xml:space="preserve">
     <value>Region translation error: {0}</value>
+  </data>
+  <data name="PreparingOcr" xml:space="preserve">
+    <value>Preparing OCR engine...</value>
+  </data>
+  <data name="RecognizingText" xml:space="preserve">
+    <value>Recognizing text...</value>
   </data>
   <data name="ErrorEngine" xml:space="preserve">
     <value>Engine error: {0}</value>

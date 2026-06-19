@@ -110,6 +110,14 @@ public static class LlmProviderService
                 HomepageUrl = "https://siliconflow.cn",
                 BaseUrl = "https://api.siliconflow.cn/v1",
                 ApiFormat = LlmApiFormat.OpenAiCompatible
+            },
+            new LlmProvider
+            {
+                DisplayName = "智谱 GLM (Zhipu)",
+                Notes = "智谱 AI 开放平台，GLM-4 系列模型",
+                HomepageUrl = "https://open.bigmodel.cn",
+                BaseUrl = "https://open.bigmodel.cn/api/paas/v4",
+                ApiFormat = LlmApiFormat.OpenAiCompatible
             }
         };
     }
@@ -126,6 +134,28 @@ public static class LlmProviderService
         }
 
         Settings.DefaultProviderId = providerId;
+        AppSettings.Current.Save();
+    }
+
+    /// <summary>
+    /// 删除指定提供商，并在删除默认提供商时清理默认提供商配置。
+    /// </summary>
+    /// <param name="provider">要删除的提供商。</param>
+    public static void DeleteProvider(LlmProvider provider)
+    {
+        if (provider is null)
+        {
+            throw new ArgumentNullException(nameof(provider));
+        }
+
+        var wasDefault = provider.IsDefault || Settings.DefaultProviderId == provider.Id;
+        Providers.Remove(provider);
+
+        if (wasDefault)
+        {
+            Settings.DefaultProviderId = null;
+        }
+
         AppSettings.Current.Save();
     }
 

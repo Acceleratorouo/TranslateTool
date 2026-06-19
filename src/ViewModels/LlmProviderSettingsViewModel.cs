@@ -155,8 +155,7 @@ public partial class LlmProviderSettingsViewModel : ObservableObject
     private void DeleteProvider(LlmProvider? provider)
     {
         if (provider is null) return;
-        LlmProviderService.Providers.Remove(provider);
-        LlmProviderService.SaveProviders();
+        LlmProviderService.DeleteProvider(provider);
         RefreshProviders();
     }
 
