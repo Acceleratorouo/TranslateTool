@@ -7,6 +7,7 @@ using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using TranslateTool.Models;
 using TranslateTool.Services;
+using TranslateTool.Utils;
 using TranslateTool.ViewModels;
 
 namespace TranslateTool.Views;
@@ -14,6 +15,8 @@ namespace TranslateTool.Views;
 public partial class FloatingWindow : Window
 {
     private const int ResizeBorder = 6; // 边缘可拖拽区域像素
+    private const uint WM_NCLBUTTONDOWN = 0x00A1;
+    private const int HTBOTTOMRIGHT = 17;
 
     // 贴边隐藏相关
     private enum DockState { Normal, DockedLeft, DockedRight, DockedTop, DockedBottom }
@@ -317,6 +320,19 @@ public partial class FloatingWindow : Window
         menu.Items.Add(apiSettingsItem);
 
         menu.IsOpen = true;
+    }
+
+    private void ResizeGrip_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        if (WindowState == WindowState.Maximized)
+        {
+            return;
+        }
+
+        NativeMethods.ReleaseCapture();
+        var handle = new WindowInteropHelper(this).Handle;
+        NativeMethods.SendMessage(handle, WM_NCLBUTTONDOWN, new IntPtr(HTBOTTOMRIGHT), IntPtr.Zero);
+        e.Handled = true;
     }
 
     private void MinimizeButton_Click(object sender, RoutedEventArgs e)

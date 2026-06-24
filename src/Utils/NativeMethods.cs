@@ -36,6 +36,9 @@ public static class NativeMethods
     [DllImport("user32.dll")]
     public static extern IntPtr SendMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
 
+    [DllImport("user32.dll")]
+    public static extern bool ReleaseCapture();
+
     [DllImport("user32.dll", CharSet = CharSet.Auto)]
     public static extern uint RegisterWindowMessage(string lpString);
 

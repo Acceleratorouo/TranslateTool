@@ -32,6 +32,7 @@ public class LlmProviderServiceTests
         Assert.Contains(templates, t => t.DisplayName == "OpenRouter");
         Assert.Contains(templates, t => t.DisplayName == "Anthropic Claude");
         Assert.Contains(templates, t => t.ApiFormat == LlmApiFormat.Anthropic);
+        Assert.Contains(templates, t => t.DisplayName == "智谱 GLM (Zhipu)");
     }
 
     [Fact]
