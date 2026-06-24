@@ -41,6 +41,8 @@ Thumbs.db
 .uploads/
 memory/
 MEMORY.md
+AGENTS.md
+CLAUDE.md
 
 ## Docs (local only)
 CODE_WIKI.md
